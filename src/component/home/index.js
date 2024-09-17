@@ -12,6 +12,7 @@ const Contain = styled.div`
 function Home() {
   return (
     <Contain>
+      TEST
       <Banners />
       <AboutMe />
       <CatBreed />

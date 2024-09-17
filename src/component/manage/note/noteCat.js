@@ -242,8 +242,8 @@ const CatNote = () => {
         <TableContainer>
           <Table>
             <TableHeader>
-              <TableHeaderItem>ชื่อแมว</TableHeaderItem>
               <TableHeaderItem>Tag Id</TableHeaderItem>
+              <TableHeaderItem>ชื่อแมว</TableHeaderItem>
               <TableHeaderItem>วันที่บันทึก</TableHeaderItem>
               <TableHeaderItem>ชื่อเรื่อง</TableHeaderItem>
               <TableHeaderItem>บันทึก</TableHeaderItem>
@@ -251,8 +251,8 @@ const CatNote = () => {
             </TableHeader>
             {filteredData.map((record, index) => (
               <TableRow key={index}>
-                <TableData>{record.name}</TableData>
                 <TableData>{record.tagId}</TableData>
+                <TableData>{record.name}</TableData>
                 <TableData>{record.date}</TableData>
                 <TableData>{record.title}</TableData>
                 <TableData>{record.notes}</TableData>

@@ -114,23 +114,20 @@ const AddVaccines = ({ open, handleClose }) => {
       <ModalContent>
         <Title>เพิ่มข้อมูลวัคซีน</Title>
         <form noValidate autoComplete="off">
-          <StyledTextField
-            fullWidth
-            id="catName"
-            label="ชื่อแมว"
-            variant="outlined"
-            value={catName}
-            onChange={(e) => setCatName(e.target.value)}
-            required
-          />
-          <StyledTextField
-            fullWidth
-            id="tagId"
-            label="Tag Id"
-            variant="outlined"
-            disabled
-            value="T1234" // Example static value, replace with dynamic if needed
-          />
+          <FormControl fullWidth variant="outlined" required>
+            <InputLabel id="cat-name-label">ชื่อแมว</InputLabel>
+            <Select
+              labelId="cat-name-label"
+              id="catName"
+              value={catName}
+              onChange={(e) => setCatName(e.target.value)}
+              label="ชื่อแมว"
+            >
+              <MenuItem value="ฟุกุ">ฟุกุ</MenuItem>
+              <MenuItem value="เลโอ">เลโอ</MenuItem>
+            </Select>
+          </FormControl>
+
           <StyledFormControl variant="outlined" required>
             <InputLabel id="vaccineToday-label">วัคซีนวันนี้</InputLabel>
             <Select

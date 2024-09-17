@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import AddCatModal from "./addCat";
 import EditCatModal from "./editCat";
 
@@ -44,22 +44,37 @@ const Card = styled.div`
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const CardAvatar = styled(Avatar)`
+const CardAvatarContainer = styled.div`
+  position: relative;
   width: 100px;
   height: 100px;
   margin: 0 auto;
-  position: relative;
 `;
 
-const StatusIcon = styled.div`
-  width: 15px;
-  height: 15px;
-  background-color: ${(props) => props.color || "green"};
+const CardAvatar = styled.img`
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  border: 2px solid white;
+  object-fit: cover;
+  background-color: #ccc; /* กรณีไม่มีรูปภาพ */
+`;
+
+const UploadButton = styled.label`
   position: absolute;
-  top: 0;
-  right: 10px;
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 4px;
+  border: 2px solid #1976d2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
 `;
 
 const CardContent = styled.div`
@@ -108,7 +123,7 @@ function DataCats() {
       gender: "ผู้",
       birthDate: "2022-07-11",
       statusColor: "orange",
-      avatar: "https://via.placeholder.com/100",
+      avatar: "https://via.placeholder.com/100", // ลิงก์รูป placeholder
     },
     {
       id: 2,
@@ -117,7 +132,7 @@ function DataCats() {
       gender: "เมีย",
       birthDate: "2022-07-11",
       statusColor: "green",
-      avatar: "https://via.placeholder.com/100",
+      avatar: "https://via.placeholder.com/100", // ลิงก์รูป placeholder
     },
   ]);
 
@@ -149,6 +164,21 @@ function DataCats() {
     closeEditCatModal();
   };
 
+  // ฟังก์ชันอัปเดตอวาตาร์
+  const handleAvatarChange = (e, catId) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedCats = catsData.map((cat) =>
+          cat.id === catId ? { ...cat, avatar: reader.result } : cat
+        );
+        setCatsData(updatedCats);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <Container>
       <Header>
@@ -163,9 +193,22 @@ function DataCats() {
             const { years, months, totalMonths } = calculateAge(cat.birthDate);
             return (
               <Card key={cat.id}>
-                <CardAvatar src={cat.avatar}>
-                  <StatusIcon color={cat.statusColor} />
-                </CardAvatar>
+                {/* วงกลมสำหรับแสดงรูปแมว */}
+                <CardAvatarContainer>
+                  <CardAvatar src={cat.avatar} alt={`รูปของ ${cat.name}`} />
+
+                  {/* ปุ่มสำหรับอัปโหลดรูป */}
+                  <UploadButton htmlFor={`avatar-upload-${cat.id}`}>
+                    <PhotoCameraIcon color="primary" />
+                    <HiddenInput
+                      id={`avatar-upload-${cat.id}`}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleAvatarChange(e, cat.id)}
+                    />
+                  </UploadButton>
+                </CardAvatarContainer>
+
                 <CardContent>
                   <h3>{cat.name}</h3>
                   <p>{cat.breed}</p>

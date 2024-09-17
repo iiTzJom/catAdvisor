@@ -240,8 +240,9 @@ const VaccinationPage = () => {
           เพิ่มข้อมูลการฉีดวัคซีน
         </AddButton>
         <TableHeader>
-          <TableHeaderItem>ชื่อแมว</TableHeaderItem>
           <TableHeaderItem>Tag Id</TableHeaderItem>
+          <TableHeaderItem>ชื่อแมว</TableHeaderItem>
+
           <TableHeaderItem>วันที่ฉีด</TableHeaderItem>
           <TableHeaderItem>วัคซีนวันนี้</TableHeaderItem>
           <TableHeaderItem>วันฉีดครั้งถัดไป</TableHeaderItem>
@@ -251,8 +252,9 @@ const VaccinationPage = () => {
         </TableHeader>
         {filteredData.map((row) => (
           <TableRow key={row.id}>
-            <TableData>{row.name}</TableData>
             <TableData>{row.tagId}</TableData>
+            <TableData>{row.name}</TableData>
+
             <TableData>{row.injectionDate}</TableData>
             <TableData>{row.vaccineToday}</TableData>
             <TableData>{row.nextInjectionDate}</TableData>

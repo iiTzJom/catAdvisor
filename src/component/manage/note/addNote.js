@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import styled from "@emotion/styled";
 
 const ModalContent = styled(Box)`
@@ -58,23 +59,19 @@ const AddNotes = ({ open, onClose, note }) => {
       }}
     >
       <ModalContent>
-        <TextField
-          label="ชื่อแมว"
-          name="name"
-          value={formData.name || ""}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Tag Id"
-          name="tagId"
-          value={formData.tagId || ""}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-          disabled
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="cat-name-label">ชื่อแมว</InputLabel>
+          <Select
+            labelId="cat-name-label"
+            name="name"
+            value={formData.name || ""}
+            onChange={handleChange}
+            label="ชื่อแมว"
+          >
+            <MenuItem value="ฟุกุ">ฟุกุ</MenuItem>
+            <MenuItem value="เลโอ">เลโอ</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           label="วันที่บันทึก"
           name="date"

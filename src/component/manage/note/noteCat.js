@@ -14,9 +14,10 @@ import NoteViews from "./ืnoteView";
 import AddNotes from "./addNote";
 
 const PageWrapper = styled.div`
-  background-color: #71a9db;
-  height: 100vh;
+  max-height: 100vh;
   padding: 20px;
+  width: 100%;
+  text-align: -webkit-center;
 `;
 
 const DivSearch = styled.div`
@@ -26,8 +27,7 @@ const DivSearch = styled.div`
   margin-bottom: 20px;
 
   .MuiInputBase-root {
-    width: 100%;
-    max-width: 800px;
+    width: 80%;
     background-color: #d9d9d9;
     border-radius: 50px;
     padding-right: 12px;
@@ -51,14 +51,16 @@ const DivSearch = styled.div`
   }
 `;
 
+const DivButton = styled.div`
+  width: 100%;
+  text-align: -webkit-right;
+  margin-bottom: 10px;
+`;
 const AddRecordButton = styled(MuiButton)`
   background-color: #f59a83;
   color: white;
   padding: 10px;
   border-radius: 50%;
-  position: absolute;
-  top: 35px;
-  right: 20px;
   min-width: 50px;
   min-height: 50px;
   display: flex;
@@ -70,8 +72,12 @@ const AddRecordButton = styled(MuiButton)`
   }
 `;
 
+const TableContainerMain = styled.div`
+  max-width: 80%;
+`;
+
 const TableContainer = styled.div`
-  max-width: 1000px;
+  max-width: 100%;
   margin: 0 auto;
   background-color: white;
   border-radius: 10px;
@@ -199,8 +205,6 @@ const CatNote = () => {
         <FormControl
           sx={{
             m: 1,
-            width: "100%",
-            maxWidth: "800px",
             "& fieldset": { border: "none" },
           }}
           variant="outlined"
@@ -226,39 +230,44 @@ const CatNote = () => {
             }}
           />
         </FormControl>
-        <AddRecordButton onClick={handleOpenAddNotes}>
-          <EditIcon style={{ color: "white", fontSize: "24px" }} />
-        </AddRecordButton>
       </DivSearch>
 
-      <TableContainer>
-        <Table>
-          <TableHeader>
-            <TableHeaderItem>ชื่อแมว</TableHeaderItem>
-            <TableHeaderItem>Tag Id</TableHeaderItem>
-            <TableHeaderItem>วันที่บันทึก</TableHeaderItem>
-            <TableHeaderItem>ชื่อเรื่อง</TableHeaderItem>
-            <TableHeaderItem>บันทึก</TableHeaderItem>
-            <TableHeaderItem align="center">ดูบันทึก</TableHeaderItem>
-          </TableHeader>
-          {filteredData.map((record, index) => (
-            <TableRow key={index}>
-              <TableData>{record.name}</TableData>
-              <TableData>{record.tagId}</TableData>
-              <TableData>{record.date}</TableData>
-              <TableData>{record.title}</TableData>
-              <TableData>{record.notes}</TableData>
-              <TableData align="center">
-                <ConfirmButton onClick={() => handleOpenNoteViews(record)}>
-                  <VisibilityIcon
-                    style={{ color: "white", fontSize: "24px" }}
-                  />
-                </ConfirmButton>
-              </TableData>
-            </TableRow>
-          ))}
-        </Table>
-      </TableContainer>
+      <TableContainerMain>
+        <DivButton>
+          <AddRecordButton onClick={handleOpenAddNotes}>
+            <EditIcon style={{ color: "white", fontSize: "24px" }} />
+          </AddRecordButton>
+        </DivButton>
+
+        <TableContainer>
+          <Table>
+            <TableHeader>
+              <TableHeaderItem>ชื่อแมว</TableHeaderItem>
+              <TableHeaderItem>Tag Id</TableHeaderItem>
+              <TableHeaderItem>วันที่บันทึก</TableHeaderItem>
+              <TableHeaderItem>ชื่อเรื่อง</TableHeaderItem>
+              <TableHeaderItem>บันทึก</TableHeaderItem>
+              <TableHeaderItem align="center">ดูบันทึก</TableHeaderItem>
+            </TableHeader>
+            {filteredData.map((record, index) => (
+              <TableRow key={index}>
+                <TableData>{record.name}</TableData>
+                <TableData>{record.tagId}</TableData>
+                <TableData>{record.date}</TableData>
+                <TableData>{record.title}</TableData>
+                <TableData>{record.notes}</TableData>
+                <TableData align="center">
+                  <ConfirmButton onClick={() => handleOpenNoteViews(record)}>
+                    <VisibilityIcon
+                      style={{ color: "white", fontSize: "24px" }}
+                    />
+                  </ConfirmButton>
+                </TableData>
+              </TableRow>
+            ))}
+          </Table>
+        </TableContainer>
+      </TableContainerMain>
 
       <AddNotes
         open={openAddNotes}

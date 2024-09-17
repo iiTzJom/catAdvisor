@@ -18,6 +18,7 @@ const DivSidebar = styled.div`
 
 const DivBody = styled.div`
   width: 85%;
+  background-color: #71a9db;
 `;
 function Manage() {
   return (

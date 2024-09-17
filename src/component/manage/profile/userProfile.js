@@ -14,7 +14,6 @@ const Contain = styled.div`
   justify-content: center;
   max-width: 100%;
   text-align: center;
-  background-color: #71a9db;
   height: 100vh;
   align-items: center;
 `;

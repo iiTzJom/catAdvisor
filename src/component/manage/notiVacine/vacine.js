@@ -10,10 +10,11 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddVaccines from "./addVaccine";
+import AddIcon from "@mui/icons-material/Add";
 
 const Container = styled.div`
   background-color: #71a9db;
-  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,7 +27,7 @@ const DivSearch = styled.div`
   margin-bottom: 20px;
 
   .MuiInputBase-root {
-    width: 785px;
+    width: 80%;
     background-color: #d9d9d9;
     border-radius: 50px;
     padding-right: 12px;
@@ -59,10 +60,8 @@ const DivSearch = styled.div`
 
 const Table = styled.div`
   width: 80%;
-  background-color: white;
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
+  text-align: end;
 `;
 
 const TableHeader = styled.div`
@@ -82,6 +81,7 @@ const TableHeaderItem = styled.div`
 const TableRow = styled.div`
   display: flex;
   border-bottom: 1px solid #ddd;
+  background-color: #ffffff;
   &:nth-child(even) {
     background-color: #f9f9f9;
   }
@@ -113,10 +113,11 @@ const AddButton = styled(Button)`
   color: white;
   padding: 10px 20px;
   border-radius: 20px;
-  position: absolute;
-  top: 35px;
-  right: 20px;
   font-size: 16px;
+  margin-bottom: 20px;
+  &:hover {
+    background-color: #fa8466;
+  }
 `;
 
 const ConfirmButton = styled(Button)`
@@ -232,7 +233,12 @@ const VaccinationPage = () => {
           />
         </FormControl>
       </DivSearch>
+
       <Table>
+        <AddButton onClick={handleOpen}>
+          <AddIcon sx={{ paddingRight: "10px" }} />
+          เพิ่มข้อมูลการฉีดวัคซีน
+        </AddButton>
         <TableHeader>
           <TableHeaderItem>ชื่อแมว</TableHeaderItem>
           <TableHeaderItem>Tag Id</TableHeaderItem>
@@ -267,8 +273,6 @@ const VaccinationPage = () => {
           </TableRow>
         ))}
       </Table>
-
-      <AddButton onClick={handleOpen}>เพิ่มข้อมูลการฉีดวัคซีน</AddButton>
 
       <AddVaccines open={open} handleClose={handleClose} />
     </Container>

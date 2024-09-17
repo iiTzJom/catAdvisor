@@ -8,15 +8,15 @@ import EditCatModal from "./editCat";
 
 const Container = styled.div`
   background-color: #71a9db;
-  min-height: 100vh;
+  max-height: 100vh;
   padding: 20px;
 `;
 
 const Header = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 40px;
+  width: 100%;
+  justify-content: end;
 `;
 
 const AddButton = styled(Button)`

@@ -76,7 +76,7 @@ const BottomMenu = styled.div`
   margin-right: 40px;
   height: -webkit-fill-available;
   cursor: pointer;
-
+  color: ${({ color }) => (color === "true" ? "#ffcc00" : "#FFFFFF")};
   &:hover {
     color: #ffcc00; /* เปลี่ยนสีเมื่อเมาส์วาง */
   }
@@ -188,6 +188,11 @@ const DivCatagory = styled.div`
   background-size: 30px 30px;
   background-repeat: no-repeat;
   background-position: center;
+`;
+
+const DivDataNotFound = styled.div`
+  width: 100%;
+  text-align: center;
 `;
 
 function BlogList() {
@@ -393,7 +398,9 @@ function BlogList() {
 
   const [dataBlog, setDataBlog] = useState(blog);
   const [keyword, setKeyword] = useState("");
+  const [ifFocus, setIsFocus] = useState("all");
   const selectCate = (id) => {
+    setIsFocus(id);
     if (id === "all") {
       setDataBlog(blog);
     } else {
@@ -446,11 +453,19 @@ function BlogList() {
           </FormControl>
         </DivSearch>
         <DivMenu>
-          <BottomMenu onClick={() => selectCate("all")}>ทั้งหมด</BottomMenu>
+          <BottomMenu
+            color={ifFocus === "all" ? "true" : "false"}
+            onClick={() => selectCate("all")}
+          >
+            ทั้งหมด
+          </BottomMenu>
           {catagoryCat.map((data, i) => (
             <>
               <Icon src={process.env.PUBLIC_URL + data.icon} />
-              <BottomMenu onClick={() => selectCate(data.id)}>
+              <BottomMenu
+                color={ifFocus === data.id ? "true" : "false"}
+                onClick={() => selectCate(data.id)}
+              >
                 {data.name}
               </BottomMenu>
             </>
@@ -458,41 +473,43 @@ function BlogList() {
         </DivMenu>
       </DivHead>
       <DivList>
-        {dataBlog.length == 0
-          ? "ไม่พบข้อมูลที่ค้นหา"
-          : dataBlog.map((data, i) => (
-              <DivCard>
-                {data.id_cate == "01J61ZZFHJAYM56B6JV9ZSQW0E" && (
-                  <DivCatagory background={"/medicon.png"} />
-                )}
-                {data.id_cate == "01J61ZZFHK6ZY1W6GBY0JV2H4X" && (
-                  <DivCatagory background={"/bookicon.png"} />
-                )}
-                {data.id_cate == "01J61ZZFHKFEKX8DYHJNC2E8YD" && (
-                  <DivCatagory background={"/caticon.png"} />
-                )}
-                {data.id_cate == "01J61ZZFHMYDYFTGDF6AK659PW" && (
-                  <DivCatagory background={"/foodicon.png"} />
-                )}
-                <DivPic src={process.env.PUBLIC_URL + data.pic} />
-                <TitleCard>{data.title}</TitleCard>
-                <Dcs>{data.dcs}</Dcs>
-                <DivBottom>
-                  <DivButton>
-                    <SeeMore
-                      onClick={() =>
-                        (window.location.href = "/text-blog-list/" + data.id)
-                      }
-                    >
-                      เพิ่มเติม
-                    </SeeMore>
-                  </DivButton>
-                  <DivReccommend>
-                    {data.recommend && <Reccommend>เเนะนำ</Reccommend>}
-                  </DivReccommend>
-                </DivBottom>
-              </DivCard>
-            ))}
+        {dataBlog.length == 0 ? (
+          <DivDataNotFound>ไม่พบข้อมูลที่ค้นหา</DivDataNotFound>
+        ) : (
+          dataBlog.map((data, i) => (
+            <DivCard>
+              {data.id_cate == "01J61ZZFHJAYM56B6JV9ZSQW0E" && (
+                <DivCatagory background={"/medicon.png"} />
+              )}
+              {data.id_cate == "01J61ZZFHK6ZY1W6GBY0JV2H4X" && (
+                <DivCatagory background={"/bookicon.png"} />
+              )}
+              {data.id_cate == "01J61ZZFHKFEKX8DYHJNC2E8YD" && (
+                <DivCatagory background={"/caticon.png"} />
+              )}
+              {data.id_cate == "01J61ZZFHMYDYFTGDF6AK659PW" && (
+                <DivCatagory background={"/foodicon.png"} />
+              )}
+              <DivPic src={process.env.PUBLIC_URL + data.pic} />
+              <TitleCard>{data.title}</TitleCard>
+              <Dcs>{data.dcs}</Dcs>
+              <DivBottom>
+                <DivButton>
+                  <SeeMore
+                    onClick={() =>
+                      (window.location.href = "/text-blog-list/" + data.id)
+                    }
+                  >
+                    เพิ่มเติม
+                  </SeeMore>
+                </DivButton>
+                <DivReccommend>
+                  {data.recommend && <Reccommend>เเนะนำ</Reccommend>}
+                </DivReccommend>
+              </DivBottom>
+            </DivCard>
+          ))
+        )}
       </DivList>
     </Contain>
   );

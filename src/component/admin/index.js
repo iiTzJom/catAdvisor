@@ -1,8 +1,7 @@
 import styled from "@emotion/styled/macro";
-import AdminSidebars from "./adminSidebar";
-import AdminManage from "../admin/adminPages";
-import BlogDataAdd from "../admin/addBlogData";
-
+import AdminSidebars from "./uiAdmin/adminSidebar";
+import AdminCatData from "./catData";
+import AddEditDataCat from "./editDataCat";
 const Contain = styled.div`
   width: 100%;
   height: 100vh;
@@ -24,8 +23,9 @@ function ManageAdmin() {
         <AdminSidebars />
       </DivSidebar>
       <DivBody>
-        {window.location.search === "?adminPageManage" && <AdminManage />}
-        {window.location.search === "?blogCatData" && <BlogDataAdd />}
+        {window.location.search === "?cat-data-list" && <AdminCatData />}
+        {window.location.search === "?add-edit-data-cat" && <AddEditDataCat />}
+        {/* {window.location.search === "?blogCatData" && <BlogDataAdd />} */}
       </DivBody>
     </Contain>
   );

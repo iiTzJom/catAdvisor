@@ -20,12 +20,14 @@ const Header = styled.div`
 `;
 
 const AddButton = styled(Button)`
-  background-color: #ffb74d;
+  background-color: #f59a83;
   color: white;
   padding: 10px 20px;
-  border-radius: 30px;
+  border-radius: 20px;
+  font-size: 16px;
+  margin-bottom: 20px;
   &:hover {
-    background-color: #ffa726;
+    background-color: #fa8466;
   }
 `;
 
@@ -71,10 +73,6 @@ const UploadButton = styled.label`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const HiddenInput = styled.input`
-  display: none;
 `;
 
 const CardContent = styled.div`

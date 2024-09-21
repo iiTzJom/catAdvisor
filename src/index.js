@@ -17,7 +17,7 @@ import CompareCat from "./component/compare/CatCompare";
 import ListBlogPage from "./component/blogList";
 import TextBlogList from "./component/blogDetail";
 import Manage from "./component/manage";
-import ManageAdmin from "./component/uiAdmin";
+import ManageAdmin from "./component/admin";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -32,7 +32,7 @@ if (
   window.location.pathname.toLocaleUpperCase() === "/ADMIN" &&
   window.location.search === ""
 ) {
-  window.location.href = "Admin?adminPageManage";
+  window.location.href = "Admin?cat-data-list";
 }
 root.render(
   <>
@@ -53,8 +53,8 @@ root.render(
         <Route path="admin" element={<ManageAdmin />} />
       </Routes>
     </BrowserRouter>
-    {window.location.pathname !== "/Manage" &&
-      window.location.pathname !== "/admin" && <Footer />}
+    {window.location.pathname.toLocaleUpperCase() !== "/MANAGE" &&
+      window.location.pathname.toLocaleUpperCase() !== "/ADMIN" && <Footer />}
   </>
 );
 

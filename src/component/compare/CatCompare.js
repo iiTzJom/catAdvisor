@@ -44,6 +44,13 @@ const DivContent = styled.div`
   justify-content: center;
   display: flex;
   margin-top: 50px;
+  .MuiFormLabel-root {
+    left: -14px;
+    top: -15px;
+  }
+  // .MuiInputBase-root {
+  //   width: 80%;
+  // }
 `;
 
 const CardList = styled.div`
@@ -86,6 +93,12 @@ const Rate = styled.div`
   margin-bottom: 30px;
 `;
 
+const DivCompare = styled.div`
+  margin-right: 40px;
+  &:nth-last-child(1) {
+    margin-right: 0;
+  }
+`;
 const RateRight = styled.div``;
 
 function CompareCat() {
@@ -183,7 +196,7 @@ function CompareCat() {
         <DcsBanner>มาดูกันว่าแมวสายพันธุ์ไหนเหมาะสมกับคุณมากที่สุด</DcsBanner>
       </CompareBanner>
       <DivContent>
-        <div>
+        <DivCompare>
           <FormControl fullWidth>
             <InputLabel>เลือกสายพันธุ์แมว 1</InputLabel>
             <Select value={selectedCat1} onChange={handleCat1Change}>
@@ -195,8 +208,8 @@ function CompareCat() {
             </Select>
           </FormControl>
           {renderCatCard(selectedCat1)}
-        </div>
-        <div>
+        </DivCompare>
+        <DivCompare>
           <FormControl fullWidth>
             <InputLabel>เลือกสายพันธุ์แมว 2</InputLabel>
             <Select value={selectedCat2} onChange={handleCat2Change}>
@@ -208,7 +221,7 @@ function CompareCat() {
             </Select>
           </FormControl>
           {renderCatCard(selectedCat2)}
-        </div>
+        </DivCompare>
       </DivContent>
     </Contain>
   );

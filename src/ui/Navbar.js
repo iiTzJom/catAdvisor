@@ -37,6 +37,7 @@ const NavbarLeft = styled.div`
   width: 20%;
   padding-top: 10px;
   color: #ffffff;
+  cursor: pointer;
 `;
 
 const NavbarRight = styled.div`
@@ -115,7 +116,9 @@ function Navbar() {
   return (
     <Contain>
       <DivNavbar>
-        <NavbarLeft>CAT ADVISOR</NavbarLeft>
+        <NavbarLeft onClick={() => (window.location.href = "/")}>
+          CAT ADVISOR
+        </NavbarLeft>
         <NavbarRight>
           {menu.map((data, i) => (
             <DivMenu onClick={() => (window.location.href = data.path)}>

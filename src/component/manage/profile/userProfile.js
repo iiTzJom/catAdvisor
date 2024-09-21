@@ -105,18 +105,20 @@ function UsersProfile() {
             src={avatarSrc}
             sx={{ width: 100, height: 100 }}
           />
-          <UploadIcon>
-            <input
-              type="file"
-              style={{ display: "none" }}
-              id="avatar-upload"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            <label htmlFor="avatar-upload">
-              <AddAPhotoIcon sx={{ color: "#1565C0" }} />
-            </label>
-          </UploadIcon>
+          {isEditable && (
+            <UploadIcon>
+              <input
+                type="file"
+                style={{ display: "none" }}
+                id="avatar-upload"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <label htmlFor="avatar-upload">
+                <AddAPhotoIcon sx={{ color: "#1565C0", cursor: "pointer" }} />
+              </label>
+            </UploadIcon>
+          )}
         </ProfileAvatar>
 
         <Box component="form">

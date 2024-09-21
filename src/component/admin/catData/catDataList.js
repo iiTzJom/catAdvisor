@@ -3,6 +3,8 @@ import styled from "@emotion/styled/macro";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
 
 const Container = styled.div`
   display: flex;
@@ -75,7 +77,7 @@ const CatName = styled.h3`
 
 const MenuDropdown = styled.div`
   position: absolute;
-  top: 40px;
+  top: 30px;
   right: 10px;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -110,43 +112,63 @@ const IconButton = styled.div`
   cursor: pointer;
 `;
 
-function AdminManage() {
-  const [selectedCardIndex, setSelectedCardIndex] = useState(null);
+const AddButton = styled(Button)`
+  background-color: #f59a83;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  &:hover {
+    background-color: #fa8466;
+  }
+`;
 
-  const handleIconClick = (index) => {
-    setSelectedCardIndex((prevIndex) => (prevIndex === index ? null : index));
+const DivButtonAdd = styled.div`
+  width: 80%;
+  text-align: end;
+`;
+
+function CatDataList() {
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
+
+  const handleIconClick = (id) => {
+    setSelectedCardIndex(id);
   };
 
-  const handleClickOutside = (event) => {
-    if (
-      !event.target.closest(".cat-card") &&
-      !event.target.closest(".page-header")
-    ) {
-      setSelectedCardIndex(null);
-    }
-  };
+  // const handleClickOutside = (event) => {
+  //   if (
+  //     !event.target.closest(".cat-card") &&
+  //     !event.target.closest(".page-header")
+  //   ) {
+  //     setSelectedCardIndex(null);
+  //   }
+  // };
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
 
   const catData = [
     {
+      id: 1,
       nameTH: "อเมริกัน ช็อตแฮร์",
       nameEN: "American Short Hair",
       bgColor: "#a0d8f1",
       image: "/AmericanStand.png",
     },
     {
+      id: 2,
       nameTH: "บริติช ช็อตแฮร์",
       nameEN: "British Short Hair",
       bgColor: "#f0a0a0",
       image: "/BritishStand.png",
     },
     {
+      id: 3,
       nameTH: "สก็อตติช โฟลด์",
       nameEN: "Scottish Fold",
       bgColor: "#fce191",
@@ -156,9 +178,50 @@ function AdminManage() {
 
   return (
     <Container>
-     
+      <ContentWrapper>
+        <DivButtonAdd>
+          <AddButton
+            onClick={() => (window.location.href = "/Admin?add-edit-data-cat")}
+            startIcon={<AddIcon />}
+          >
+            เพิ่มข้อมูลแมว
+          </AddButton>
+        </DivButtonAdd>
+        <CardGrid>
+          {catData.map((cat, index) => (
+            <CatCard key={index} bgColor={cat.bgColor} className="cat-card">
+              <CatImage src={cat.image} alt={cat.nameEN} />
+              <CatName>
+                {cat.nameTH}
+                <br />
+                {cat.nameEN}
+              </CatName>
+              <MenuDropdown
+                onMouseLeave={() => setSelectedCardIndex(0)}
+                show={selectedCardIndex === cat.id}
+              >
+                <MenuItem>
+                  <MenuIcon>
+                    <EditIcon />
+                  </MenuIcon>
+                  แก้ไข
+                </MenuItem>
+                <MenuItem>
+                  <MenuIcon>
+                    <DeleteIcon />
+                  </MenuIcon>
+                  ลบ
+                </MenuItem>
+              </MenuDropdown>
+              <IconButton onClick={() => handleIconClick(cat.id)}>
+                <MoreHorizIcon />
+              </IconButton>
+            </CatCard>
+          ))}
+        </CardGrid>
+      </ContentWrapper>
     </Container>
   );
 }
 
-export default AdminManage;
+export default CatDataList;

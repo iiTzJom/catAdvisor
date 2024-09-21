@@ -90,7 +90,7 @@ const LogoutButton = styled.div`
 function AdminSidebars() {
   const menu = [
     {
-      path: "?adminPageManage",
+      path: "?cat-data-list",
       name: "หน้าADMIN",
       icon: "/caticon.png",
     },

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled/macro";
-import Button from "@mui/material/Button";
+import PanoramaIcon from "@mui/icons-material/Panorama";
+import { TextField, Button, Select, MenuItem } from "@mui/material";
 
 const Container = styled.div`
   width: 100%;
@@ -49,10 +50,67 @@ const DivDataEdit = styled.div`
   position: relative;
 `;
 
-const DivDataInSide = styled.div`
-  padding: 40px;
-  font-size: 100px;
-  font-weight: 900;
+const UploadBox = styled.div`
+  position: absolute;
+  border: 1px dashed #aaa;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 100px;
+  margin-left: 100px;
+  text-align: center;
+  width: 500px; /* ขนาดกล่อง */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* เงา */
+  cursor: pointer;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
+const TextFieldWrapper = styled.div`
+  position: absolute;
+  width: 300px;
+  margin-top: 400px;
+  margin-left: 100px;
+`;
+
+const AdditionalDetailsWrapper = styled.div`
+  position: absolute;
+  width: 660px;
+  margin-top: 85px;
+  margin-left: 750px;
+`;
+
+const RatingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* เพิ่มระยะห่างระหว่าง RatingItem แทนการใช้ margin */
+  position: absolute;
+  margin-top: 400px;
+  margin-left: 750px;
+`;
+
+const RatingItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px; /* ลดระยะห่างให้ใกล้กันมากขึ้น */
+`;
+
+const Label = styled.label`
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const SelectDropdown = styled(Select)`
+  width: 100px;
+`;
+
+const Note = styled.p`
+  position: absolute;
+  font-size: 12px;
+  color: #d7878a;
+  margin-top: 670px;
+  margin-left: 750px;
 `;
 
 const DivButtonNext = styled.div`
@@ -79,6 +137,18 @@ const ButtonNextPrev = styled(Button)`
 
 function ManageDataCat() {
   const [isStep, setIsSetp] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [personality, setPersonality] = useState(null);
+  const [affection, setAffection] = useState(null);
+  const [grooming, setGrooming] = useState(null);
+  const [friendliness, setFriendliness] = useState();
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(URL.createObjectURL(file));
+    }
+  };
 
   const Step = [
     {
@@ -106,11 +176,12 @@ function ManageDataCat() {
       text: "โรคทางพันธุกรรม",
     },
   ];
+
   return (
     <Container>
       <DivStep>
         {Step.map((data) => (
-          <div>
+          <div key={data.id}>
             <NumStep
               bg={isStep === data.id ? "true" : "false"}
               left={data.left}
@@ -125,7 +196,106 @@ function ManageDataCat() {
       </DivStep>
       {isStep === 1 && (
         <DivDataEdit>
-          <DivDataInSide>1</DivDataInSide>
+          <UploadBox
+            onClick={() => document.getElementById("imageUpload").click()}
+          >
+            <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+            <p>อัปโหลดรูปภาพ</p>
+            <HiddenInput
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Selected"
+                style={{ width: "80px", marginTop: "10px" }}
+              />
+            )}
+          </UploadBox>
+          <TextFieldWrapper>
+            <TextField
+              label="ชื่อภาษาไทย"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="ชื่อภาษาอังกฤษ"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+            />
+          </TextFieldWrapper>
+          <AdditionalDetailsWrapper>
+            <TextField
+              label="คำอธิบาย"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              multiline
+              rows={10}
+            />
+          </AdditionalDetailsWrapper>
+          <RatingContainer>
+            <RatingItem>
+              <Label>ลักษณะนิสัย</Label>
+              <SelectDropdown
+                value={personality}
+                onChange={(e) => setPersonality(e.target.value)}
+              >
+                {[...Array(10).keys()].map((i) => (
+                  <MenuItem value={i + 1} key={i}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </SelectDropdown>
+            </RatingItem>
+            <RatingItem>
+              <Label>ความขี้อ้อน</Label>
+              <SelectDropdown
+                value={affection}
+                onChange={(e) => setAffection(e.target.value)}
+              >
+                {[...Array(10).keys()].map((i) => (
+                  <MenuItem value={i + 1} key={i}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </SelectDropdown>
+            </RatingItem>
+            <RatingItem>
+              <Label>การดูแลขน</Label>
+              <SelectDropdown
+                value={grooming}
+                onChange={(e) => setGrooming(e.target.value)}
+              >
+                {[...Array(10).keys()].map((i) => (
+                  <MenuItem value={i + 1} key={i}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </SelectDropdown>
+            </RatingItem>
+            <RatingItem>
+              <Label>ความเป็นมิตร</Label>
+              <SelectDropdown
+                value={friendliness}
+                onChange={(e) => setFriendliness(e.target.value)}
+              >
+                {[...Array(10).keys()].map((i) => (
+                  <MenuItem value={i + 1} key={i}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </SelectDropdown>
+            </RatingItem>
+          </RatingContainer>
+          <Note>
+            *หมายเหตุ: คะแนนเต็มในแต่ละช่องคือ 10 คะแนน โดย 1 คะแนนเท่ากับ 1 ดาว
+          </Note>
           <DivButtonNext>
             <ButtonNextPrev
               bg={"#FFBF6B"}
@@ -140,7 +310,35 @@ function ManageDataCat() {
 
       {isStep === 2 && (
         <DivDataEdit>
-          <DivDataInSide>2</DivDataInSide>
+          <UploadBox
+            onClick={() => document.getElementById("imageUpload").click()}
+          >
+            <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+            <p>อัปโหลดรูปภาพ</p>
+            <HiddenInput
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Selected"
+                style={{ width: "80px", marginTop: "10px" }}
+              />
+            )}
+          </UploadBox>
+          <AdditionalDetailsWrapper>
+            <TextField
+              label="คำอธิบาย"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              multiline
+              rows={20}
+            />
+          </AdditionalDetailsWrapper>
           <DivButtonNext>
             <ButtonNextPrev
               bg={"#D7878A"}
@@ -162,7 +360,35 @@ function ManageDataCat() {
 
       {isStep === 3 && (
         <DivDataEdit>
-          <DivDataInSide>3</DivDataInSide>
+          <UploadBox
+            onClick={() => document.getElementById("imageUpload").click()}
+          >
+            <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+            <p>อัปโหลดรูปภาพ</p>
+            <HiddenInput
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Selected"
+                style={{ width: "80px", marginTop: "10px" }}
+              />
+            )}
+          </UploadBox>
+          <AdditionalDetailsWrapper>
+            <TextField
+              label="คำอธิบาย"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              multiline
+              rows={20}
+            />
+          </AdditionalDetailsWrapper>
           <DivButtonNext>
             <ButtonNextPrev
               bg={"#D7878A"}
@@ -184,7 +410,35 @@ function ManageDataCat() {
 
       {isStep === 4 && (
         <DivDataEdit>
-          <DivDataInSide>4</DivDataInSide>
+          <UploadBox
+            onClick={() => document.getElementById("imageUpload").click()}
+          >
+            <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+            <p>อัปโหลดรูปภาพ</p>
+            <HiddenInput
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Selected"
+                style={{ width: "80px", marginTop: "10px" }}
+              />
+            )}
+          </UploadBox>
+          <AdditionalDetailsWrapper>
+            <TextField
+              label="คำอธิบาย"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              multiline
+              rows={20}
+            />
+          </AdditionalDetailsWrapper>
           <DivButtonNext>
             <ButtonNextPrev
               bg={"#D7878A"}

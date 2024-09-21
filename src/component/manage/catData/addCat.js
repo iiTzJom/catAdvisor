@@ -131,7 +131,6 @@ const AddCatModal = ({
     }
   }, [catData]);
   console.log("catData::", dataCat);
-  // console.log("service::", service);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];

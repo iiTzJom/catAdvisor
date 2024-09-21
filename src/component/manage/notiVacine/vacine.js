@@ -6,11 +6,16 @@ import {
   OutlinedInput,
   IconButton,
   Button,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddVaccines from "./addVaccine";
 import AddIcon from "@mui/icons-material/Add";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EditIcon from "@mui/icons-material/Edit"; // เพิ่มไอคอนแก้ไข
+import DeleteIcon from "@mui/icons-material/Delete"; // เพิ่มไอคอนลบ
 
 const Container = styled.div`
   background-color: #71a9db;
@@ -169,6 +174,8 @@ const VaccinationPage = () => {
   const [filteredData, setFilteredData] = React.useState(dataBlog);
   const [keyword, setKeyword] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [selectedData, setSelectedData] = React.useState(null); // สำหรับเก็บข้อมูลแมวที่เลือก
+  const [anchorEl, setAnchorEl] = React.useState(null); // สำหรับ dropdown
 
   React.useEffect(() => {
     if (keyword === "") {
@@ -190,8 +197,33 @@ const VaccinationPage = () => {
     );
   };
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = (id) => {
+    const dataToEdit = dataBlog.find((item) => item.id === id);
+    setSelectedData(dataToEdit); // ตั้งค่า selectedData
+    setOpen(true); // เปิด Modal
+    handleCloseMenu();
+  };
+
+  const handleDelete = (id) => {
+    // ฟังก์ชันการลบที่นี่
+    handleCloseMenu();
+  };
+
+  const handleSave = (updatedData) => {
+    setDataBlog((prevData) =>
+      prevData.map((item) => (item.id === updatedData.id ? updatedData : item))
+    );
+    setOpen(false);
+    setSelectedData(null); // ล้างข้อมูลที่เลือก
+  };
 
   const getStatusText = (status) => {
     switch (status) {
@@ -236,14 +268,13 @@ const VaccinationPage = () => {
       </DivSearch>
 
       <Table>
-        <AddButton onClick={handleOpen}>
+        <AddButton onClick={() => setOpen(true)}>
           <AddIcon sx={{ paddingRight: "10px" }} />
           เพิ่มข้อมูลการฉีดวัคซีน
         </AddButton>
         <TableHeader>
           <TableHeaderItem>Tag Id</TableHeaderItem>
           <TableHeaderItem>ชื่อแมว</TableHeaderItem>
-
           <TableHeaderItem>วันที่ฉีด</TableHeaderItem>
           <TableHeaderItem>วัคซีนวันนี้</TableHeaderItem>
           <TableHeaderItem>วันฉีดครั้งถัดไป</TableHeaderItem>
@@ -255,7 +286,6 @@ const VaccinationPage = () => {
           <TableRow key={row.id}>
             <TableData>{row.tagId}</TableData>
             <TableData>{row.name}</TableData>
-
             <TableData>{row.injectionDate}</TableData>
             <TableData>{row.vaccineToday}</TableData>
             <TableData>{row.nextInjectionDate}</TableData>
@@ -265,19 +295,38 @@ const VaccinationPage = () => {
             </TableData>
             <TableData>
               {row.status === "completed" ? null : (
-                <ConfirmButton
-                  variant="contained"
-                  onClick={() => handleConfirm(row.id)}
-                >
-                  <CheckCircleIcon style={{ color: "white" }} />
-                </ConfirmButton>
+                <>
+                  <ConfirmButton
+                    variant="contained"
+                    onClick={() => handleConfirm(row.id)}
+                  >
+                    <CheckCircleIcon />
+                  </ConfirmButton>
+                  <IconButton onClick={handleOpenMenu}>
+                    <MoreHorizIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                  >
+                    <MenuItem onClick={() => handleEdit(row.id)}>
+                      <EditIcon style={{ marginRight: "8px" }} />
+                      แก้ไข
+                    </MenuItem>
+                    <MenuItem onClick={() => handleDelete(row.id)}>
+                      <DeleteIcon style={{ marginRight: "8px" }} />
+                      ลบ
+                    </MenuItem>
+                  </Menu>
+                </>
               )}
             </TableData>
           </TableRow>
         ))}
       </Table>
 
-      <AddVaccines open={open} handleClose={handleClose} />
+      <AddVaccines open={open} handleClose={() => setOpen(false)} />
     </Container>
   );
 };

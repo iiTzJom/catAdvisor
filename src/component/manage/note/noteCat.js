@@ -3,12 +3,16 @@ import styled from "@emotion/styled";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {
   Button as MuiButton,
   FormControl,
   OutlinedInput,
   InputAdornment,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import NoteViews from "./noteView";
 import AddNotes from "./addNote";
@@ -56,6 +60,7 @@ const DivButton = styled.div`
   text-align: -webkit-right;
   margin-bottom: 10px;
 `;
+
 const AddRecordButton = styled(MuiButton)`
   background-color: #f59a83;
   color: white;
@@ -150,6 +155,7 @@ const CatNote = () => {
   const [openAddNotes, setOpenAddNotes] = useState(false);
   const [openNoteViews, setOpenNoteViews] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const dataBlog = [
     {
@@ -181,26 +187,45 @@ const CatNote = () => {
   }, [keyword, dataBlog]);
 
   const handleOpenAddNotes = () => {
-    setSelectedNote(null); // Clear the selected note for new notes
-    setOpenAddNotes(true); // Open AddNotes modal
-    setOpenNoteViews(false); // Ensure NoteViews modal is closed
+    setSelectedNote(null);
+    setOpenAddNotes(true);
+    setOpenNoteViews(false);
   };
 
   const handleOpenNoteViews = (note) => {
-    setSelectedNote(note); // Set the note to be viewed
-    setOpenNoteViews(true); // Open NoteViews modal
-    setOpenAddNotes(false); // Ensure AddNotes modal is closed
+    setSelectedNote(note);
+    setOpenNoteViews(true);
+    setOpenAddNotes(false);
   };
 
   const handleCloseModal = () => {
     setOpenAddNotes(false);
     setOpenNoteViews(false);
     setSelectedNote(null);
+    setAnchorEl(null);
+  };
+
+  const handleDropdownClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleDropdownClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditNote = (note) => {
+    setSelectedNote(note);
+    setOpenAddNotes(true);
+    handleDropdownClose();
+  };
+
+  const handleDeleteNote = (tagId) => {
+    console.log(`Deleted note with Tag ID: ${tagId}`);
+    handleDropdownClose();
   };
 
   return (
     <PageWrapper>
-      {/* Search Bar */}
       <DivSearch>
         <FormControl
           sx={{
@@ -263,6 +288,25 @@ const CatNote = () => {
                       style={{ color: "white", fontSize: "24px" }}
                     />
                   </ConfirmButton>
+                  <IconButton onClick={handleDropdownClick}>
+                    <MoreHorizIcon
+                      style={{ color: "black", fontSize: "24px" }}
+                    />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleDropdownClose}
+                  >
+                    <MenuItem onClick={() => handleEditNote(record)}>
+                      <EditIcon style={{ marginRight: "8px" }} />
+                      แก้ไข
+                    </MenuItem>
+                    <MenuItem onClick={() => handleDeleteNote(record.tagId)}>
+                      <DeleteIcon style={{ marginRight: "8px" }} />
+                      ลบ
+                    </MenuItem>
+                  </Menu>
                 </TableData>
               </TableRow>
             ))}

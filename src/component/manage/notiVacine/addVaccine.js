@@ -69,48 +69,20 @@ const vaccines = [
   // เพิ่มชื่อวัคซีนแมวอื่น ๆ ตามต้องการ
 ];
 
-const AddVaccines = ({ open, handleClose }) => {
-  const [catName, setCatName] = React.useState("");
-  const [vaccineToday, setVaccineToday] = React.useState("");
-  const [date, setDate] = React.useState("");
-  const [nextVaccineDate, setNextVaccineDate] = React.useState("");
-  const [nextVaccine, setNextVaccine] = React.useState("");
+const AddVaccines = ({ open, handleClose, data, onSave }) => {
+  const [formData, setFormData] = React.useState(data || {});
+
+  React.useEffect(() => {
+    setFormData(data || {}); // ตั้งค่าข้อมูลเมื่อเปิด Modal
+  }, [data]);
 
   const handleSubmit = () => {
-    if (
-      !catName ||
-      !vaccineToday ||
-      !date ||
-      !nextVaccineDate ||
-      !nextVaccine
-    ) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-      return;
-    }
-
-    // Handle form submission
-    console.log(
-      "Cat Name:",
-      catName,
-      "Vaccine Today:",
-      vaccineToday,
-      "Date:",
-      date,
-      "Next Vaccine Date:",
-      nextVaccineDate,
-      "Next Vaccine:",
-      nextVaccine
-    );
+    onSave(formData); // เรียกใช้ฟังก์ชันบันทึกข้อมูล
     handleClose();
   };
 
   return (
-    <ModalBackdrop
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
+    <ModalBackdrop open={open} onClose={handleClose}>
       <ModalContent>
         <Title>เพิ่มข้อมูลวัคซีน</Title>
         <form noValidate autoComplete="off">
@@ -119,8 +91,10 @@ const AddVaccines = ({ open, handleClose }) => {
             <Select
               labelId="cat-name-label"
               id="catName"
-              value={catName}
-              onChange={(e) => setCatName(e.target.value)}
+              value={formData.name || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               label="ชื่อแมว"
             >
               <MenuItem value="ฟุกุ">ฟุกุ</MenuItem>
@@ -133,8 +107,10 @@ const AddVaccines = ({ open, handleClose }) => {
             <Select
               labelId="vaccineToday-label"
               id="vaccineToday"
-              value={vaccineToday}
-              onChange={(e) => setVaccineToday(e.target.value)}
+              value={formData.vaccineToday || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, vaccineToday: e.target.value })
+              }
               label="วัคซีนวันนี้"
             >
               {vaccines.map((vaccine) => (
@@ -144,35 +120,42 @@ const AddVaccines = ({ open, handleClose }) => {
               ))}
             </Select>
           </StyledFormControl>
+
           <StyledTextField
             fullWidth
             id="injectionDate"
             label="วันที่ฉีด"
             type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={formData.date || ""}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
             InputLabelProps={{ shrink: true }}
             variant="outlined"
             required
           />
+
           <StyledTextField
             fullWidth
             id="nextInjectionDate"
             label="วันฉีดครั้งถัดไป"
             type="date"
-            value={nextVaccineDate}
-            onChange={(e) => setNextVaccineDate(e.target.value)}
+            value={formData.nextVaccineDate || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, nextVaccineDate: e.target.value })
+            }
             InputLabelProps={{ shrink: true }}
             variant="outlined"
             required
           />
+
           <StyledFormControl variant="outlined" required>
             <InputLabel id="nextVaccine-label">วัคซีนครั้งถัดไป</InputLabel>
             <Select
               labelId="nextVaccine-label"
               id="nextVaccine"
-              value={nextVaccine}
-              onChange={(e) => setNextVaccine(e.target.value)}
+              value={formData.nextVaccine || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, nextVaccine: e.target.value })
+              }
               label="วัคซีนครั้งถัดไป"
             >
               {vaccines.map((vaccine) => (
@@ -182,6 +165,7 @@ const AddVaccines = ({ open, handleClose }) => {
               ))}
             </Select>
           </StyledFormControl>
+
           <Box
             display="flex"
             flexDirection="column"

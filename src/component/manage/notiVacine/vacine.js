@@ -215,6 +215,7 @@ const VaccinationPage = () => {
             id="outlined-adornment-password"
             type={"text"}
             value={keyword}
+            placeholder="ค้นหาชื่อ"
             endAdornment={
               <InputAdornment position="end">
                 <IconButton

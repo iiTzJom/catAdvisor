@@ -29,6 +29,11 @@ const NoteText = styled.p`
   margin: 8px 0;
 `;
 
+const Line = styled.div`
+  width: 100%;
+  border-top: dashed 1px #6e6e6e;
+  margin-top: 20px;
+`;
 const NoteViews = ({ open, onClose, note }) => {
   if (!note) return null;
 
@@ -40,12 +45,13 @@ const NoteViews = ({ open, onClose, note }) => {
       aria-describedby="modal-description"
     >
       <ModalContent>
+        <InfoText>
+          <strong>Tag Id:</strong> {note.tagId}
+        </InfoText>
+        <Line />
         <Title id="modal-title">{note.title}</Title>
         <InfoText>
           <strong>ชื่อแมว:</strong> {note.name}
-        </InfoText>
-        <InfoText>
-          <strong>Tag Id:</strong> {note.tagId}
         </InfoText>
         <InfoText>
           <strong>วันที่บันทึก:</strong> {note.date}

@@ -10,13 +10,13 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import NoteViews from "./ืnoteView";
+import NoteViews from "./noteView";
 import AddNotes from "./addNote";
 
 const PageWrapper = styled.div`
   max-height: 100vh;
   padding: 20px;
-  width: 100%;
+  max-width: 100%;
   text-align: -webkit-center;
 `;
 
@@ -213,6 +213,7 @@ const CatNote = () => {
             id="outlined-adornment-password"
             type="text"
             value={keyword}
+            placeholder="ค้นหาชื่อ"
             endAdornment={
               <InputAdornment position="end">
                 <IconButton

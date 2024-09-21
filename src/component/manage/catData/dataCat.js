@@ -139,6 +139,7 @@ function DataCats() {
   const [isAddCatModalOpen, setIsAddCatModalOpen] = useState(false);
   const [isEditCatModalOpen, setIsEditCatModalOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState(null);
+  const [typeModal, setTypeModal] = useState("Create");
 
   const openAddCatModal = () => setIsAddCatModalOpen(true);
   const closeAddCatModal = () => setIsAddCatModalOpen(false);
@@ -182,7 +183,14 @@ function DataCats() {
   return (
     <Container>
       <Header>
-        <AddButton startIcon={<AddIcon />} onClick={openAddCatModal}>
+        <AddButton
+          startIcon={<AddIcon />}
+          onClick={() => {
+            setTypeModal("Create");
+            setSelectedCat(null);
+            openAddCatModal();
+          }}
+        >
           เพิ่มข้อมูลแมว
         </AddButton>
       </Header>
@@ -198,7 +206,7 @@ function DataCats() {
                   <CardAvatar src={cat.avatar} alt={`รูปของ ${cat.name}`} />
 
                   {/* ปุ่มสำหรับอัปโหลดรูป */}
-                  <UploadButton htmlFor={`avatar-upload-${cat.id}`}>
+                  {/* <UploadButton htmlFor={`avatar-upload-${cat.id}`}>
                     <PhotoCameraIcon color="primary" />
                     <HiddenInput
                       id={`avatar-upload-${cat.id}`}
@@ -206,7 +214,7 @@ function DataCats() {
                       accept="image/*"
                       onChange={(e) => handleAvatarChange(e, cat.id)}
                     />
-                  </UploadButton>
+                  </UploadButton> */}
                 </CardAvatarContainer>
 
                 <CardContent>
@@ -226,7 +234,11 @@ function DataCats() {
                 <CardButton variant="delete">ลบ</CardButton>
                 <CardButton
                   variant="edit"
-                  onClick={() => openEditCatModal(cat)}
+                  onClick={() => {
+                    setTypeModal("Edit");
+                    setSelectedCat(cat);
+                    openAddCatModal();
+                  }}
                 >
                   แก้ไข
                 </CardButton>
@@ -242,14 +254,16 @@ function DataCats() {
         open={isAddCatModalOpen}
         handleClose={closeAddCatModal}
         handleSubmit={handleAddCat}
+        service={typeModal}
+        catData={selectedCat}
       />
 
-      <EditCatModal
+      {/* <EditCatModal
         open={isEditCatModalOpen}
         cat={selectedCat}
         handleClose={closeEditCatModal}
         handleSubmit={handleEditCat}
-      />
+      /> */}
     </Container>
   );
 }

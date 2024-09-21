@@ -3,10 +3,13 @@ import styled from "@emotion/styled/macro";
 const Contain = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 25px;
   max-width: 100%;
   height: 100vh;
   background-color: #eae7e6;
+`;
+
+const ContainInside = styled.div`
+  padding: 25px;
 `;
 
 const Header = styled.div`
@@ -108,29 +111,31 @@ function AdminSidebars() {
 
   return (
     <Contain>
-      <Header>
-        <DivPicAbout
-          src={process.env.PUBLIC_URL + "/CatAdvisorLogo.png"}
-          onClick={handleLogoClick}
-        />
-        <TextSide>CAT ADVISOR</TextSide>
-      </Header>
-      <DivMenu>
-        {menu.map((data, i) => (
-          <DivButton
-            key={i}
-            focus={window.location.search === data.path && "#1860C3"}
-            onClick={() => (window.location.href = "/admin" + data.path)}
-          >
-            <Icon src={process.env.PUBLIC_URL + data.icon} />
-            <BottomMenu>{data.name}</BottomMenu>
-          </DivButton>
-        ))}
-      </DivMenu>
-      <BottomSection>
-        <ProfileTag>Tag ID: 12345</ProfileTag>
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </BottomSection>
+      <ContainInside>
+        <Header>
+          <DivPicAbout
+            src={process.env.PUBLIC_URL + "/CatAdvisorLogo.png"}
+            onClick={handleLogoClick}
+          />
+          <TextSide>CAT ADVISOR</TextSide>
+        </Header>
+        <DivMenu>
+          {menu.map((data, i) => (
+            <DivButton
+              key={i}
+              focus={window.location.search === data.path && "#1860C3"}
+              onClick={() => (window.location.href = "/admin" + data.path)}
+            >
+              <Icon src={process.env.PUBLIC_URL + data.icon} />
+              <BottomMenu>{data.name}</BottomMenu>
+            </DivButton>
+          ))}
+        </DivMenu>
+        {/* <BottomSection>
+          <ProfileTag>Tag ID: 12345</ProfileTag>
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        </BottomSection> */}
+      </ContainInside>
     </Contain>
   );
 }

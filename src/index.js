@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
@@ -21,10 +21,23 @@ import ManageAdmin from "./component/uiAdmin";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+if (
+  window.location.pathname.toLocaleUpperCase() === "/MANAGE" &&
+  window.location.search === ""
+) {
+  window.location.href = "Manage?profile";
+}
+
+if (
+  window.location.pathname.toLocaleUpperCase() === "/ADMIN" &&
+  window.location.search === ""
+) {
+  window.location.href = "Admin?adminPageManage";
+}
 root.render(
   <>
-    {window.location.pathname !== "/Manage" &&
-      window.location.pathname !== "/admin" && <Navbar />}
+    {window.location.pathname.toLocaleUpperCase() !== "/MANAGE" &&
+      window.location.pathname.toLocaleUpperCase() !== "/ADMIN" && <Navbar />}
 
     <BrowserRouter>
       <Routes>

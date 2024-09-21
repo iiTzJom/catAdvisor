@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import styled from "@emotion/styled";
@@ -54,21 +54,35 @@ const CardAvatarContainer = styled.div`
   flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
+  position: relative;
 `;
 
-const CardAvatar = styled.img`
+const CardAvatar = styled.div`
   width: 100px;
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px; /* Space between the image and the upload button */
   border: 2px solid #ddd; /* Optional: Add border to the image */
+  position: relative;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url(${(props) =>
+    process.env.PUBLIC_URL + props.background});
 `;
 
 const UploadButton = styled.label`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 4px;
+  border: 2px solid #1976d2;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const HiddenInput = styled.input`
@@ -79,36 +93,59 @@ const AddCatModal = ({
   open,
   handleClose,
   handleSubmit,
-  catsData,
-  setCatsData,
+  catData,
+  service,
   cat = {}, // Default to an empty object if cat is not provided
 }) => {
-  const [name, setName] = useState(cat.name || "");
-  const [breed, setBreed] = useState(cat.breed || "");
-  const [birthDate, setBirthDate] = useState(cat.birthDate || "");
-  const [gender, setGender] = useState(cat.gender || "");
-  const [image, setImage] = useState(cat.avatar || ""); // Initialize with cat.avatar
+  const [dataCat, setDataCat] = useState({
+    avatar: "https://via.placeholder.com/100",
+    birthDate: "",
+    breed: "",
+    gender: "",
+    id: "",
+    name: "",
+    statusColor: "",
+  });
+
+  useEffect(() => {
+    if (catData != null) {
+      setDataCat({
+        avatar: catData.avatar,
+        birthDate: catData.birthDate,
+        breed: catData.breed,
+        gender: catData.gender,
+        id: catData.id,
+        name: catData.name,
+        statusColor: catData.statusColor,
+      });
+    } else {
+      setDataCat({
+        avatar: "https://via.placeholder.com/100",
+        birthDate: "",
+        breed: "",
+        gender: "",
+        id: "",
+        name: "",
+        statusColor: "",
+      });
+    }
+  }, [catData]);
+  console.log("catData::", dataCat);
+  // console.log("service::", service);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result); // Update image state with the base64 URL
+        setDataCat({ ...dataCat, avatar: reader.result }); // Update image state with the base64 URL
       };
       reader.readAsDataURL(file);
     }
   };
 
   const onSubmit = () => {
-    const newCat = {
-      name,
-      breed,
-      birthDate,
-      gender,
-      avatar: image, // Use the updated image URL
-    };
-    handleSubmit(newCat);
+    handleSubmit(dataCat);
     handleClose();
   };
 
@@ -120,18 +157,21 @@ const AddCatModal = ({
       aria-describedby="add-cat-modal-description"
     >
       <Box sx={style}>
-        <ModalHeader>เพิ่มข้อมูลแมว</ModalHeader>
+        <ModalHeader>
+          {service === "Edit" ? "แก้ไขข้อมูลแมว" : "เพิ่มข้อมูลแมว"}
+        </ModalHeader>
         <CardAvatarContainer>
-          <CardAvatar src={image} alt={`รูปของ ${name}`} />
-          <UploadButton htmlFor={`avatar-upload`}>
-            <PhotoCameraIcon color="primary" />
-            <HiddenInput
-              id={`avatar-upload`}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
-          </UploadButton>
+          <CardAvatar background={dataCat.avatar}>
+            <UploadButton htmlFor={`avatar-upload`}>
+              <PhotoCameraIcon color="primary" />
+              <HiddenInput
+                id={`avatar-upload`}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </UploadButton>
+          </CardAvatar>
         </CardAvatarContainer>
         <StyledTextField
           autoFocus
@@ -139,22 +179,22 @@ const AddCatModal = ({
           label="ชื่อแมว"
           type="text"
           variant="outlined"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={dataCat.name}
+          onChange={(e) => setDataCat({ ...dataCat, name: e.target.value })}
         />
         <StyledTextField
           margin="dense"
           label="พันธุ์แมว"
           type="text"
           variant="outlined"
-          value={breed}
-          onChange={(e) => setBreed(e.target.value)}
+          value={dataCat.breed}
+          onChange={(e) => setDataCat({ ...dataCat, breed: e.target.value })}
         />
         <StyledFormControl variant="outlined">
           <InputLabel>เพศ</InputLabel>
           <Select
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
+            value={dataCat.gender}
+            onChange={(e) => setDataCat({ ...dataCat, gender: e.target.value })}
             label="เพศ"
           >
             <MenuItem value="ผู้">ผู้</MenuItem>
@@ -167,10 +207,14 @@ const AddCatModal = ({
           type="date"
           InputLabelProps={{ shrink: true }}
           variant="outlined"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
+          value={dataCat.birthDate}
+          onChange={(e) =>
+            setDataCat({ ...dataCat, birthDate: e.target.value })
+          }
         />
-        <SubmitButton onClick={onSubmit}>บันทึกข้อมูล</SubmitButton>
+        <SubmitButton onClick={onSubmit}>
+          {service === "Edit" ? "บันทึกการเปลี่ยนแปลง" : "บันทึกข้อมูล"}
+        </SubmitButton>
       </Box>
     </Modal>
   );

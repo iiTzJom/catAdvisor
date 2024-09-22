@@ -17,6 +17,8 @@ import {
 import NoteViews from "./noteView";
 import AddNotes from "./addNote";
 
+//New Update
+
 const PageWrapper = styled.div`
   max-height: 100vh;
   padding: 20px;

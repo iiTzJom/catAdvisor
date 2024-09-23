@@ -276,6 +276,7 @@ const CatNote = () => {
               <TableHeaderItem>ชื่อเรื่อง</TableHeaderItem>
               <TableHeaderItem>บันทึก</TableHeaderItem>
               <TableHeaderItem align="center">ดูบันทึก</TableHeaderItem>
+              <TableHeaderItem align="center">แก้ไข</TableHeaderItem>
             </TableHeader>
             {filteredData.map((record, index) => (
               <TableRow key={index}>
@@ -290,6 +291,8 @@ const CatNote = () => {
                       style={{ color: "white", fontSize: "24px" }}
                     />
                   </ConfirmButton>
+                </TableData>
+                <TableData align="center">
                   <IconButton onClick={handleDropdownClick}>
                     <MoreHorizIcon
                       style={{ color: "black", fontSize: "24px" }}

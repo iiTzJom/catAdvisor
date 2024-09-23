@@ -10,6 +10,7 @@ import {
   Select,
 } from "@mui/material";
 import styled from "@emotion/styled";
+import Switch from "@mui/material/Switch";
 
 const ModalBackdrop = styled(Modal)`
   display: flex;
@@ -57,6 +58,15 @@ const StyledSubmitButton = styled(Button)`
   }
 `;
 
+const DivSwitch = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+const DivTextSwitch = styled.div`
+  padding-top: 8px;
+`;
 const vaccines = [
   "วัคซีนป้องกันโรคหวัด",
   "วัคซีนป้องกันโรคท้องเสีย",
@@ -69,7 +79,7 @@ const vaccines = [
   // เพิ่มชื่อวัคซีนแมวอื่น ๆ ตามต้องการ
 ];
 
-const AddVaccines = ({ open, handleClose, data, onSave }) => {
+const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
   const [formData, setFormData] = React.useState(data || {});
 
   React.useEffect(() => {
@@ -81,10 +91,12 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
     handleClose();
   };
 
+  const label = { inputProps: { "aria-label": "Color switch demo" } };
+
   return (
     <ModalBackdrop open={open} onClose={handleClose}>
       <ModalContent>
-        <Title>เพิ่มข้อมูลวัคซีน</Title>
+        <Title>{type === "edit" ? "แก้ไขข้อมูล" : "เพิ่มข้อมูลวัคซีน"}</Title>
         <form noValidate autoComplete="off">
           <FormControl fullWidth variant="outlined" required>
             <InputLabel id="cat-name-label">ชื่อแมว</InputLabel>
@@ -101,7 +113,6 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
               <MenuItem value="เลโอ">เลโอ</MenuItem>
             </Select>
           </FormControl>
-
           <StyledFormControl variant="outlined" required>
             <InputLabel id="vaccineToday-label">วัคซีนวันนี้</InputLabel>
             <Select
@@ -120,7 +131,6 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
               ))}
             </Select>
           </StyledFormControl>
-
           <StyledTextField
             fullWidth
             id="injectionDate"
@@ -132,7 +142,6 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
             variant="outlined"
             required
           />
-
           <StyledTextField
             fullWidth
             id="nextInjectionDate"
@@ -146,7 +155,6 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
             variant="outlined"
             required
           />
-
           <StyledFormControl variant="outlined" required>
             <InputLabel id="nextVaccine-label">วัคซีนครั้งถัดไป</InputLabel>
             <Select
@@ -165,7 +173,10 @@ const AddVaccines = ({ open, handleClose, data, onSave }) => {
               ))}
             </Select>
           </StyledFormControl>
-
+          <DivSwitch>
+            <Switch {...label} defaultChecked color="success" />
+            <DivTextSwitch>ดำเนินการเสร็จสิ้น</DivTextSwitch>
+          </DivSwitch>
           <Box
             display="flex"
             flexDirection="column"

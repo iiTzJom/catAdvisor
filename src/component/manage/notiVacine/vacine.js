@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import {
   FormControl,
@@ -98,12 +98,15 @@ const TableData = styled.div`
   padding: 12px;
   text-align: left;
   flex: 1;
-  display: flex;
   align-items: center;
   gap: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: fit-content;
+  .MuiButtonBase-root {
+    padding: 0;
+  }
 `;
 
 const Status = styled.span`
@@ -178,6 +181,7 @@ const VaccinationPage = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedData, setSelectedData] = React.useState(null); // สำหรับเก็บข้อมูลแมวที่เลือก
   const [anchorEl, setAnchorEl] = React.useState(null); // สำหรับ dropdown
+  const [isType, setIsType] = useState("create");
 
   React.useEffect(() => {
     if (keyword === "") {
@@ -212,6 +216,7 @@ const VaccinationPage = () => {
     setSelectedData(dataToEdit); // ตั้งค่า selectedData
     setOpen(true); // เปิด Modal
     handleCloseMenu();
+    setIsType("edit");
   };
 
   const handleDelete = (id) => {
@@ -270,7 +275,12 @@ const VaccinationPage = () => {
       </DivSearch>
 
       <Table>
-        <AddButton onClick={() => setOpen(true)}>
+        <AddButton
+          onClick={() => {
+            setOpen(true);
+            setIsType("create");
+          }}
+        >
           <AddIcon sx={{ paddingRight: "10px" }} />
           เพิ่มข้อมูลการฉีดวัคซีน
         </AddButton>
@@ -282,7 +292,9 @@ const VaccinationPage = () => {
           <TableHeaderItem>วันฉีดครั้งถัดไป</TableHeaderItem>
           <TableHeaderItem>วัคซีนครั้งถัดไป</TableHeaderItem>
           <TableHeaderItem>สถานะ</TableHeaderItem>
-          <TableHeaderItem>ยืนยัน</TableHeaderItem>
+          <TableHeaderItem style={{ textAlign: "center" }}>
+            แก้ไข
+          </TableHeaderItem>
         </TableHeader>
         {filteredData.map((row) => (
           <TableRow key={row.id}>
@@ -295,40 +307,34 @@ const VaccinationPage = () => {
             <TableData>
               <Status status={row.status}>{getStatusText(row.status)}</Status>
             </TableData>
-            <TableData>
-              {row.status === "completed" ? null : (
-                <>
-                  <ConfirmButton
-                    variant="contained"
-                    onClick={() => handleConfirm(row.id)}
-                  >
-                    <CheckCircleIcon />
-                  </ConfirmButton>
-                  <IconButton onClick={handleOpenMenu}>
-                    <MoreHorizIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleCloseMenu}
-                  >
-                    <MenuItem onClick={() => handleEdit(row.id)}>
-                      <EditIcon style={{ marginRight: "8px" }} />
-                      แก้ไข
-                    </MenuItem>
-                    <MenuItem onClick={() => handleDelete(row.id)}>
-                      <DeleteIcon style={{ marginRight: "8px" }} />
-                      ลบ
-                    </MenuItem>
-                  </Menu>
-                </>
-              )}
+            <TableData style={{ textAlign: "center" }}>
+              <IconButton onClick={handleOpenMenu}>
+                <MoreHorizIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+              >
+                <MenuItem onClick={() => handleEdit(row.id)}>
+                  <EditIcon style={{ marginRight: "8px" }} />
+                  แก้ไข
+                </MenuItem>
+                <MenuItem onClick={() => handleDelete(row.id)}>
+                  <DeleteIcon style={{ marginRight: "8px" }} />
+                  ลบ
+                </MenuItem>
+              </Menu>
             </TableData>
           </TableRow>
         ))}
       </Table>
 
-      <AddVaccines open={open} handleClose={() => setOpen(false)} />
+      <AddVaccines
+        open={open}
+        handleClose={() => setOpen(false)}
+        type={isType}
+      />
     </Container>
   );
 };

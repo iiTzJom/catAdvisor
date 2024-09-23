@@ -125,10 +125,6 @@ const Label = styled.label`
   width: 100px;
 `;
 
-const SelectDropdown = styled(Select)`
-  width: 100px;
-`;
-
 const Note = styled.p`
   font-size: 12px;
   color: #d7878a;
@@ -183,10 +179,6 @@ const DivIcon = styled.div`
 function ManageDataCat() {
   const [isStep, setIsSetp] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [personality, setPersonality] = useState(null);
-  const [affection, setAffection] = useState(null);
-  const [grooming, setGrooming] = useState(null);
-  const [friendliness, setFriendliness] = useState();
 
   const [dataCata, setDataCat] = useState({
     scoreCharacter: 1,

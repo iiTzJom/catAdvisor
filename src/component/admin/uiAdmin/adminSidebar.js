@@ -1,4 +1,5 @@
 import styled from "@emotion/styled/macro";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Contain = styled.div`
   display: flex;
@@ -10,6 +11,9 @@ const Contain = styled.div`
 
 const ContainInside = styled.div`
   padding: 25px;
+  flex: 1; /* ให้ใช้พื้นที่ที่เหลือทั้งหมด */
+  display: flex;
+  flex-direction: column; /* เพื่อให้สามารถจัดวาง BottomSection ได้ */
 `;
 
 const Header = styled.div`
@@ -32,7 +36,7 @@ const TextSide = styled.div`
 
 const DivMenu = styled.div`
   margin-top: 20px;
-  flex: 1; /* ใช้พื้นที่ที่เหลือทั้งหมดเพื่อให้ ProfileTag และ LogoutButton อยู่ที่ด้านล่าง */
+  flex: 1; /* ใช้พื้นที่ที่เหลือทั้งหมด */
 `;
 
 const DivButton = styled.div`
@@ -60,12 +64,18 @@ const BottomMenu = styled.div`
   padding-left: 5px;
 `;
 
-// เพิ่ม styled components ใหม่
 const BottomSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center; /* จัดตำแหน่งให้อยู่กึ่งกลางแนวนอน */
   margin-top: auto; /* ให้พื้นที่ว่างด้านบน */
+  margin-bottom: 20px; /* เว้นระยะห่างจากด้านล่าง */
+`;
+
+const ProfileIcon = styled(AccountCircleIcon)`
+  font-size: 60px !important;
+  color: #ccc;
+  margin-bottom: 10px;
 `;
 
 const ProfileTag = styled.div`
@@ -131,10 +141,11 @@ function AdminSidebars() {
             </DivButton>
           ))}
         </DivMenu>
-        {/* <BottomSection>
+        <BottomSection>
+          <ProfileIcon />
           <ProfileTag>Tag ID: 12345</ProfileTag>
           <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-        </BottomSection> */}
+        </BottomSection>
       </ContainInside>
     </Contain>
   );

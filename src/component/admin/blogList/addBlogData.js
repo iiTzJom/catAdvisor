@@ -1,7 +1,16 @@
 import styled from "@emotion/styled/macro";
 import { useState } from "react";
 import PanoramaIcon from "@mui/icons-material/Panorama";
-import { TextField, Button, FormControlLabel, Switch } from "@mui/material";
+import {
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 
 const Container = styled.div`
   max-width: 100%;
@@ -33,6 +42,7 @@ const DivBodyEdit = styled.div`
 const DivLeft = styled.div`
   width: 49%;
 `;
+
 const DivRight = styled.div`
   width: 49%;
   margin-left: 2%;
@@ -92,7 +102,39 @@ const ButtonNextPrev = styled(Button)`
   }
 `;
 
+const categories = [
+  {
+    id: "01J61ZZFHKFEKX8DYHJNC2E8YD",
+    name: "ลักษณะพิเศษต่างๆของแมว",
+    icon: "/caticon.png",
+  },
+  {
+    id: "01J61ZZFHK6ZY1W6GBY0JV2FGC",
+    name: "การเลี้ยงดู",
+    icon: "/heart_3319163.png",
+  },
+  {
+    id: "01J61ZZFHMYDYFTGDF6AK659PW",
+    name: "อุปกรณ์/สิ่งจำเป็น",
+    icon: "/foodicon.png",
+  },
+  {
+    id: "01J61ZZFHJAYM56B6JV9ZSQW0E",
+    name: "โรคทั่วไปของเเมว",
+    icon: "/medicon.png",
+  },
+  {
+    id: "01J61ZZFHK6ZY1W6GBY0JV2H4X",
+    name: "ประสบการณ์จากผู้พัฒนา",
+    icon: "/bookicon.png",
+  },
+];
+
 function BlogDataAdd() {
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isEnd, setIsEnd] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -100,8 +142,9 @@ function BlogDataAdd() {
     }
   };
 
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isEnd, setIsEnd] = useState(false); // State for Switch
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+  };
 
   const handleSwitchChange = (event) => {
     setIsEnd(event.target.checked);
@@ -134,8 +177,21 @@ function BlogDataAdd() {
                 )}
               </DivIconUpload>
             </UploadBox>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>เลือกหมวดหมู่</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                label="เลือกหมวดหมู่"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControlLabel
-              value="เเนะนำ"
               control={
                 <Switch
                   color="primary"
@@ -144,7 +200,7 @@ function BlogDataAdd() {
                 />
               }
               label="เเนะนำ"
-              labelPlacement="แนะนำ"
+              labelPlacement="end"
             />
           </DivLeft>
           <DivRight>

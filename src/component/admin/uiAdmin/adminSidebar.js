@@ -106,8 +106,8 @@ function AdminSidebars() {
       icon: "/caticon.png",
     },
     {
-      path: "?blogCatData",
-      pathEdit: "?add-edit-blogCatData",
+      path: "?blog-data-list",
+      pathEdit: "?blogCatData",
       name: "ความรู้ทั่วไป",
       icon: "/heart_3319163.png",
     },

@@ -3,6 +3,7 @@ import AdminSidebars from "./uiAdmin/adminSidebar";
 import AdminCatData from "./catData";
 import AddEditDataCat from "./editDataCat";
 import BlogDataAdd from "./blogList/addBlogData";
+import BlogDataList from "./blogListData/blogListData";
 const Contain = styled.div`
   width: 100%;
   height: 100vh;
@@ -26,6 +27,7 @@ function ManageAdmin() {
       <DivBody>
         {window.location.search === "?cat-data-list" && <AdminCatData />}
         {window.location.search === "?add-edit-data-cat" && <AddEditDataCat />}
+        {window.location.search === "?blog-data-list" && <BlogDataList />}
         {window.location.search === "?blogCatData" && <BlogDataAdd />}
       </DivBody>
     </Contain>

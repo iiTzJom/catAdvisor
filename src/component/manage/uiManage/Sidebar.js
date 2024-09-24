@@ -65,13 +65,12 @@ const BottomSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center; /* จัดตำแหน่งให้อยู่กึ่งกลางแนวนอน */
-  position: absolute;
-  bottom: 20px; /* เว้นระยะห่างจากด้านล่าง 20px */
-  width: 100%; /* ให้เต็มพื้นที่ด้านใน */
+  margin-top: 450px; /* ให้พื้นที่ว่างด้านบน */
+  margin-bottom: 20px; /* เว้นระยะห่างจากด้านล่าง */
 `;
 
 const ProfileIcon = styled(AccountCircleIcon)`
-  font-size: 60px;
+  font-size: 60px !important;
   color: #ccc;
   margin-bottom: 10px;
 `;

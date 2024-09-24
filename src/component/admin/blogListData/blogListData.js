@@ -134,7 +134,10 @@ const DivMenu = styled.div`
   border-radius: 5px;
 `;
 
-// Mock data for categories and blogs
+const FilterWrapper = styled.div`
+  margin-bottom: 20px;
+`;
+
 const categories = [
   {
     id: "01J61ZZFHKFEKX8DYHJNC2E8YD",
@@ -335,17 +338,7 @@ const blog = [
   },
 ];
 function BlogDataList() {
-  // State for managing menu anchor element
   const [isOpenMenu, setIsOpenMenu] = useState(null);
-
-  // Function to handle menu open
-  // const handleMenuOpen = (event) => {
-  //   setIsOpenMenu(event.currentTarget);
-  // };
-
-  // const handleMenuClose = () => {
-  //   setIsOpenMenu(null);
-  // };
 
   return (
     <Container>
@@ -394,5 +387,4 @@ function BlogDataList() {
     </Container>
   );
 }
-
 export default BlogDataList;

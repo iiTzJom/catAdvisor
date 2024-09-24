@@ -11,6 +11,9 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
+import ReactHtmlParser from "react-html-parser";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 
 const Container = styled.div`
   max-width: 100%;
@@ -99,6 +102,27 @@ const ButtonNextPrev = styled(Button)`
   }
 `;
 
+const style = {
+  position: "absolute",
+  width: "1100px",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  padding: "20px",
+};
+
+const DivReviewBt = styled.div`
+  width: 100%;
+  text-align: end;
+`;
+const ReviewBt = styled.div`
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+`;
+
 const categories = [
   {
     id: "01J61ZZFHKFEKX8DYHJNC2E8YD",
@@ -131,6 +155,9 @@ function BlogDataAdd() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEnd, setIsEnd] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [dataCat, setDataCat] = useState({
+    descriptionGenaralKnowledge: "",
+  });
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -146,6 +173,9 @@ function BlogDataAdd() {
   const handleSwitchChange = (event) => {
     setIsEnd(event.target.checked);
   };
+
+  const [textReview, setTextReview] = useState("");
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   return (
     <Container>
@@ -196,8 +226,22 @@ function BlogDataAdd() {
                 fullWidth
                 margin="normal"
                 multiline
-                rows={20}
+                rows={12}
+                defaultValue={dataCat.descriptionInfo}
+                onChange={(e) =>
+                  setDataCat({ ...dataCat, descriptionInfo: e.target.value })
+                }
               />
+              <DivReviewBt>
+                <ReviewBt
+                  onClick={() => {
+                    setIsOpenModal(true);
+                    setTextReview(dataCat.descriptionInfo);
+                  }}
+                >
+                  ดูตัวอย่าง
+                </ReviewBt>
+              </DivReviewBt>
             </AdditionalDetailsWrapper>
             <FormControl fullWidth margin="normal" sx={{ marginTop: "40px" }}>
               <InputLabel>เลือกหมวดหมู่</InputLabel>
@@ -221,6 +265,21 @@ function BlogDataAdd() {
           </ButtonNextPrev>
         </DivButtonNext>
       </DivDataEdit>
+      <Modal
+        open={isOpenModal}
+        onClose={() => {
+          setIsOpenModal(false);
+          setTextReview("");
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {textReview === ""
+            ? "ไม่พบข้อมูลดูตัวอย่าง"
+            : ReactHtmlParser(textReview)}
+        </Box>
+      </Modal>
     </Container>
   );
 }

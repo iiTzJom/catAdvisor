@@ -210,6 +210,9 @@ function ManageDataCat() {
     scoreFurCare: 1,
     scoreFriendliness: 1,
     descriptionInfo: "",
+    descriptionAppear: "",
+    descriptionTemper: "",
+    descriptionIll: "",
   });
 
   const [textReview, setTextReview] = useState("");
@@ -491,8 +494,25 @@ function ManageDataCat() {
                   fullWidth
                   margin="normal"
                   multiline
-                  rows={20}
+                  rows={12}
+                  defaultValue={dataCat.descriptionAppear}
+                  onChange={(e) =>
+                    setDataCat({
+                      ...dataCat,
+                      descriptionAppear: e.target.value,
+                    })
+                  }
                 />
+                <DivReviewBt>
+                  <ReviewBt
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      setTextReview(dataCat.descriptionAppear);
+                    }}
+                  >
+                    ดูตัวอย่าง
+                  </ReviewBt>
+                </DivReviewBt>
               </AdditionalDetailsWrapper>
             </DivRight>
           </DivBodyEdit>
@@ -551,8 +571,25 @@ function ManageDataCat() {
                   fullWidth
                   margin="normal"
                   multiline
-                  rows={20}
+                  rows={12}
+                  defaultValue={dataCat.descriptionTemper}
+                  onChange={(e) =>
+                    setDataCat({
+                      ...dataCat,
+                      descriptionTemper: e.target.value,
+                    })
+                  }
                 />
+                <DivReviewBt>
+                  <ReviewBt
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      setTextReview(dataCat.descriptionTemper);
+                    }}
+                  >
+                    ดูตัวอย่าง
+                  </ReviewBt>
+                </DivReviewBt>
               </AdditionalDetailsWrapper>
             </DivRight>
           </DivBodyEdit>
@@ -611,8 +648,25 @@ function ManageDataCat() {
                   fullWidth
                   margin="normal"
                   multiline
-                  rows={20}
+                  rows={12}
+                  defaultValue={dataCat.descriptionIll}
+                  onChange={(e) =>
+                    setDataCat({
+                      ...dataCat,
+                      descriptionIll: e.target.value,
+                    })
+                  }
                 />
+                <DivReviewBt>
+                  <ReviewBt
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      setTextReview(dataCat.descriptionIll);
+                    }}
+                  >
+                    ดูตัวอย่าง
+                  </ReviewBt>
+                </DivReviewBt>
               </AdditionalDetailsWrapper>
             </DivRight>
           </DivBodyEdit>

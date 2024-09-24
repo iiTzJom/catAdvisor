@@ -14,15 +14,11 @@ import {
 
 const Container = styled.div`
   max-width: 100%;
-  padding: 25px 60px;
-  max-height: 100%;
-  background-color: #71a9db;
+  padding: 70px 60px;
 `;
-
 const DivDataEdit = styled.div`
-  max-width: 101%;
+  max-width: 100%;
   background-color: #ffffff;
-  margin-top: 100px;
   height: 80vh;
   min-height: 80vh;
   position: relative;
@@ -68,6 +64,7 @@ const DivIconUpload = styled.div`
 
 const AdditionalDetailsWrapper = styled.div`
   margin-top: 40px;
+
   .MuiFormControl-root {
     margin: 0;
   }
@@ -177,21 +174,9 @@ function BlogDataAdd() {
                 )}
               </DivIconUpload>
             </UploadBox>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>เลือกหมวดหมู่</InputLabel>
-              <Select
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                label="เลือกหมวดหมู่"
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+
             <FormControlLabel
+              sx={{ marginTop: "40px" }}
               control={
                 <Switch
                   color="primary"
@@ -214,6 +199,20 @@ function BlogDataAdd() {
                 rows={20}
               />
             </AdditionalDetailsWrapper>
+            <FormControl fullWidth margin="normal" sx={{ marginTop: "40px" }}>
+              <InputLabel>เลือกหมวดหมู่</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                label="เลือกหมวดหมู่"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </DivRight>
         </DivBodyEdit>
         <DivButtonNext>

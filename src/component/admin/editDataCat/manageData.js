@@ -4,6 +4,10 @@ import PanoramaIcon from "@mui/icons-material/Panorama";
 import { TextField, Button, Select, MenuItem } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import ReactHtmlParser from "react-html-parser";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import { Padding } from "@mui/icons-material";
 
 const Container = styled.div`
   width: 100%;
@@ -98,6 +102,15 @@ const AdditionalDetailsWrapper = styled.div`
   }
 `;
 
+const DivReviewBt = styled.div`
+  width: 100%;
+  text-align: end;
+`;
+const ReviewBt = styled.div`
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+`;
 const RatingContainer = styled.div`
   display: flex;
   margin-top: 50px;
@@ -176,16 +189,31 @@ const DivIcon = styled.div`
   }
 `;
 
+const style = {
+  position: "absolute",
+  width: "1100px",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  padding: "20px",
+};
+
 function ManageDataCat() {
   const [isStep, setIsSetp] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const [dataCata, setDataCat] = useState({
+  const [dataCat, setDataCat] = useState({
     scoreCharacter: 1,
     scorePersistence: 1,
     scoreFurCare: 1,
     scoreFriendliness: 1,
+    descriptionInfo: "",
   });
+
+  const [textReview, setTextReview] = useState("");
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -220,6 +248,8 @@ function ManageDataCat() {
       text: "โรคทางพันธุกรรม",
     },
   ];
+
+  console.log("dataCatdataCatdataCat::", dataCat.descriptionInfo);
 
   return (
     <Container>
@@ -288,28 +318,42 @@ function ManageDataCat() {
                   margin="normal"
                   multiline
                   rows={10}
+                  defaultValue={dataCat.descriptionInfo}
+                  onChange={(e) =>
+                    setDataCat({ ...dataCat, descriptionInfo: e.target.value })
+                  }
                 />
+                <DivReviewBt>
+                  <ReviewBt
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      setTextReview(dataCat.descriptionInfo);
+                    }}
+                  >
+                    ดูตัวอย่าง
+                  </ReviewBt>
+                </DivReviewBt>
               </AdditionalDetailsWrapper>
               <RatingContainer>
                 <RatingItem>
                   <Label>ลักษณะนิสัย</Label>
-                  <TextField value={dataCata.scoreCharacter} />
+                  <TextField value={dataCat.scoreCharacter} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCata.scoreCharacter < 10 &&
+                        dataCat.scoreCharacter < 10 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreCharacter: dataCata.scoreCharacter + 1,
+                          ...dataCat,
+                          scoreCharacter: dataCat.scoreCharacter + 1,
                         })
                       }
                     />
                     <RemoveIcon
                       onClick={() =>
-                        dataCata.scoreCharacter !== 1 &&
+                        dataCat.scoreCharacter !== 1 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreCharacter: dataCata.scoreCharacter - 1,
+                          ...dataCat,
+                          scoreCharacter: dataCat.scoreCharacter - 1,
                         })
                       }
                     />
@@ -318,23 +362,23 @@ function ManageDataCat() {
 
                 <RatingItem>
                   <Label>ความขี้อ้อน</Label>
-                  <TextField value={dataCata.scorePersistence} />
+                  <TextField value={dataCat.scorePersistence} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCata.scorePersistence < 10 &&
+                        dataCat.scorePersistence < 10 &&
                         setDataCat({
-                          ...dataCata,
-                          scorePersistence: dataCata.scorePersistence + 1,
+                          ...dataCat,
+                          scorePersistence: dataCat.scorePersistence + 1,
                         })
                       }
                     />
                     <RemoveIcon
                       onClick={() =>
-                        dataCata.scorePersistence !== 1 &&
+                        dataCat.scorePersistence !== 1 &&
                         setDataCat({
-                          ...dataCata,
-                          scorePersistence: dataCata.scorePersistence - 1,
+                          ...dataCat,
+                          scorePersistence: dataCat.scorePersistence - 1,
                         })
                       }
                     />
@@ -345,23 +389,23 @@ function ManageDataCat() {
               <RatingContainer>
                 <RatingItem>
                   <Label>การดูแลขน</Label>
-                  <TextField value={dataCata.scoreFurCare} />
+                  <TextField value={dataCat.scoreFurCare} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCata.scoreFurCare < 10 &&
+                        dataCat.scoreFurCare < 10 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreFurCare: dataCata.scoreFurCare + 1,
+                          ...dataCat,
+                          scoreFurCare: dataCat.scoreFurCare + 1,
                         })
                       }
                     />
                     <RemoveIcon
                       onClick={() =>
-                        dataCata.scoreFurCare !== 1 &&
+                        dataCat.scoreFurCare !== 1 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreFurCare: dataCata.scoreFurCare - 1,
+                          ...dataCat,
+                          scoreFurCare: dataCat.scoreFurCare - 1,
                         })
                       }
                     />
@@ -370,23 +414,23 @@ function ManageDataCat() {
 
                 <RatingItem>
                   <Label>ความเป็นมิตร</Label>
-                  <TextField value={dataCata.scoreFriendliness} />
+                  <TextField value={dataCat.scoreFriendliness} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCata.scoreFriendliness < 10 &&
+                        dataCat.scoreFriendliness < 10 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreFriendliness: dataCata.scoreFriendliness + 1,
+                          ...dataCat,
+                          scoreFriendliness: dataCat.scoreFriendliness + 1,
                         })
                       }
                     />
                     <RemoveIcon
                       onClick={() =>
-                        dataCata.scoreFriendliness !== 1 &&
+                        dataCat.scoreFriendliness !== 1 &&
                         setDataCat({
-                          ...dataCata,
-                          scoreFriendliness: dataCata.scoreFriendliness - 1,
+                          ...dataCat,
+                          scoreFriendliness: dataCat.scoreFriendliness - 1,
                         })
                       }
                     />
@@ -587,6 +631,21 @@ function ManageDataCat() {
           </DivButtonNext>
         </DivDataEdit>
       )}
+      <Modal
+        open={isOpenModal}
+        onClose={() => {
+          setIsOpenModal(false);
+          setTextReview("");
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {textReview === ""
+            ? "ไม่พบข้อมูลดูตัวอย่าง"
+            : ReactHtmlParser(textReview)}
+        </Box>
+      </Modal>
     </Container>
   );
 }

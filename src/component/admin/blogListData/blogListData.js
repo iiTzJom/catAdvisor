@@ -3,10 +3,8 @@ import styled from "@emotion/styled/macro";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { Button, Menu, MenuItem } from "@mui/material";
 
 // Styles for the main container and card components
 const Container = styled.div`
@@ -44,6 +42,28 @@ const CardList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  overflow-y: scroll;
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #ededed;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #d4d2d2;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4;
+  }
 `;
 
 const Card = styled.div`
@@ -57,8 +77,10 @@ const Card = styled.div`
 `;
 
 const CardImage = styled.img`
-  max-width: 100%;
+  width: 300px;
+  height: 275px;
   border-radius: 8px;
+  object-fit: cover;
 `;
 
 const CardTitle = styled.h3`
@@ -78,9 +100,12 @@ const CardDescription = styled.p`
 
 const IconWrapper = styled.div`
   position: absolute;
-  top: 10px;
+  top: -2px;
   right: 10px;
   cursor: pointer;
+  &.MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const DivReccommend = styled.div`
@@ -97,6 +122,16 @@ const Reccommend = styled.div`
   background-color: #d7878a;
   padding: 5px 30px;
   text-align: center;
+`;
+
+const DivMenu = styled.div`
+  background-color: #ffffff;
+  position: absolute;
+  z-index: 1;
+  left: -80px;
+  top: 20px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 `;
 
 // Mock data for categories and blogs
@@ -301,16 +336,16 @@ const blog = [
 ];
 function BlogDataList() {
   // State for managing menu anchor element
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [isOpenMenu, setIsOpenMenu] = useState(null);
 
   // Function to handle menu open
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleMenuOpen = (event) => {
+  //   setIsOpenMenu(event.currentTarget);
+  // };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleMenuClose = () => {
+  //   setIsOpenMenu(null);
+  // };
 
   return (
     <Container>
@@ -324,29 +359,30 @@ function BlogDataList() {
           </AddButton>
         </DivButtonAdd>
         <CardList>
-          {blog.map((blog) => (
+          {blog.map((blog, i) => (
             <Card key={blog.id}>
               <CardImage src={blog.pic} alt={blog.title} />
               <CardTitle>{blog.title}</CardTitle>
               <CardDescription>{blog.dcs}</CardDescription>
               <IconWrapper>
-                <MoreHorizIcon onClick={handleMenuOpen} />
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem
-                    onClick={() =>
-                      (window.location.href = "/Admin?blogCatData")
-                    }
-                  >
-                    <EditIcon /> แก้ไข
-                  </MenuItem>
-                  <MenuItem onClick={handleMenuClose}>
-                    <DeleteIcon /> ลบ
-                  </MenuItem>
-                </Menu>
+                <MoreHorizIcon onClick={() => setIsOpenMenu(blog.id)} />
+
+                {isOpenMenu == blog.id && (
+                  <DivMenu onMouseLeave={() => setIsOpenMenu(null)}>
+                    <MenuItem
+                      onClick={() =>
+                        (window.location.href = "/Admin?blogCatData")
+                      }
+                    >
+                      <EditIcon style={{ marginRight: "8px" }} />
+                      แก้ไข
+                    </MenuItem>
+                    <MenuItem>
+                      <DeleteIcon style={{ marginRight: "8px" }} />
+                      ลบ
+                    </MenuItem>
+                  </DivMenu>
+                )}
               </IconWrapper>
             </Card>
           ))}

@@ -7,7 +7,7 @@ import BlogDataList from "./blogListData/blogListData";
 const Contain = styled.div`
   width: 100%;
   height: 100vh;
-  background-color: #1860c3;
+  background-color: #71a9db;
   display: flex;
 `;
 

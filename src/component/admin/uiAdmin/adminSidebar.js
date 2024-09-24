@@ -91,12 +91,14 @@ function AdminSidebars() {
   const menu = [
     {
       path: "?cat-data-list",
-      name: "หน้าADMIN",
+      pathEdit: "?add-edit-data-cat",
+      name: "ข้อมูลแมว",
       icon: "/caticon.png",
     },
     {
       path: "?blogCatData",
-      name: "เพิ่มข้อมูลทั่วไป",
+      pathEdit: "?add-edit-blogCatData",
+      name: "ความรู้ทั่วไป",
       icon: "/heart_3319163.png",
     },
   ];
@@ -123,7 +125,11 @@ function AdminSidebars() {
           {menu.map((data, i) => (
             <DivButton
               key={i}
-              focus={window.location.search === data.path && "#1860C3"}
+              focus={
+                (window.location.search === data.path ||
+                  window.location.search === data.pathEdit) &&
+                "#1860C3"
+              }
               onClick={() => (window.location.href = "/admin" + data.path)}
             >
               <Icon src={process.env.PUBLIC_URL + data.icon} />

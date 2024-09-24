@@ -1,4 +1,8 @@
 import styled from "@emotion/styled/macro";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import PetsIcon from "@mui/icons-material/Pets";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NoteIcon from "@mui/icons-material/Note";
 
 const Contain = styled.div`
   display: flex;
@@ -6,11 +10,13 @@ const Contain = styled.div`
   max-width: 100%;
   height: 100vh;
   background-color: #eae7e6;
+  position: relative;
 `;
 
 const ContainInside = styled.div`
   padding: 25px;
 `;
+
 const Header = styled.div`
   display: flex;
   align-items: center; /* จัดให้อยู่กลางตามแนวแกน Y */
@@ -31,7 +37,7 @@ const TextSide = styled.div`
 
 const DivMenu = styled.div`
   margin-top: 20px;
-  flex: 1; /* ใช้พื้นที่ที่เหลือทั้งหมดเพื่อให้ ProfileTag และ LogoutButton อยู่ที่ด้านล่าง */
+  flex: 1; /* ใช้พื้นที่ที่เหลือทั้งหมด */
 `;
 
 const DivButton = styled.div`
@@ -41,17 +47,12 @@ const DivButton = styled.div`
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 10px;
-`;
-
-const Icon = styled.img`
-  height: 20px;
-  margin-right: 5px;
+  align-items: center; /* จัดให้อยู่กลางตามแนวแกน Y */
 `;
 
 const BottomMenu = styled.div`
   width: fit-content;
   padding: 1px;
-  height: -webkit-fill-available;
   cursor: pointer;
   &:hover {
     opacity: 0.8;
@@ -64,7 +65,15 @@ const BottomSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center; /* จัดตำแหน่งให้อยู่กึ่งกลางแนวนอน */
-  margin-top: auto; /* ให้พื้นที่ว่างด้านบน */
+  position: absolute;
+  bottom: 20px; /* เว้นระยะห่างจากด้านล่าง 20px */
+  width: 100%; /* ให้เต็มพื้นที่ด้านใน */
+`;
+
+const ProfileIcon = styled(AccountCircleIcon)`
+  font-size: 60px;
+  color: #ccc;
+  margin-bottom: 10px;
 `;
 
 const ProfileTag = styled.div`
@@ -91,22 +100,22 @@ function Sidebars() {
     {
       path: "?profile",
       name: "แก้ไขโปรไฟล์",
-      icon: "/caticon.png",
+      icon: <AccountCircleIcon />,
     },
     {
       path: "?catData",
       name: "ข้อมูลแมว",
-      icon: "/heart_3319163.png",
+      icon: <PetsIcon />,
     },
     {
       path: "?notiVacine",
       name: "แจ้งเตือนการฉีดวัคซีน",
-      icon: "/foodicon.png",
+      icon: <NotificationsIcon />,
     },
     {
       path: "?note",
       name: "สมุดบันทึก",
-      icon: "/medicon.png",
+      icon: <NoteIcon />,
     },
   ];
 
@@ -115,7 +124,6 @@ function Sidebars() {
   };
 
   const handleLogout = () => {
-    // ลอคเอาท์จากระบบ
     console.log("Logout");
   };
 
@@ -136,15 +144,16 @@ function Sidebars() {
               focus={window.location.search === data.path && "#1860C3"}
               onClick={() => (window.location.href = "/Manage" + data.path)}
             >
-              <Icon src={process.env.PUBLIC_URL + data.icon} />
+              {data.icon}
               <BottomMenu>{data.name}</BottomMenu>
             </DivButton>
           ))}
         </DivMenu>
-        {/* <BottomSection>
-        <ProfileTag>Tag ID: 12345</ProfileTag>
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </BottomSection> */}
+        <BottomSection>
+          <ProfileIcon />
+          <ProfileTag>Tag ID: 12345</ProfileTag>
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        </BottomSection>
       </ContainInside>
     </Contain>
   );

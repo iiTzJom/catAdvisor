@@ -1,7 +1,10 @@
+import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import styled from "@emotion/styled/macro";
 import TextField from "@mui/material/TextField";
+import { register } from "../../api/auth";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const style = {
   position: "absolute",
@@ -13,6 +16,13 @@ const style = {
   boxShadow: 24,
 };
 
+const DivLoading = styled.div`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  z-index: 100;
+`;
 const Login = styled.div`
   display: flex;
   width: 100%;
@@ -26,6 +36,7 @@ const LoginLeft = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  min-height: 500px;
 `;
 
 const ImgLogoLeft = styled.img`
@@ -105,6 +116,56 @@ const LoginButton = styled.div`
 `;
 
 function RegisterModal({ open, close }) {
+  const [dataRegister, setDataRegister] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    userName: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAlert, setIsAlert] = useState(null);
+  const [isRegis, setIsRegis] = useState(false);
+  const handleRegister = () => {
+    console.log("dataRegister", dataRegister);
+    if (dataRegister.firstName === "") {
+      setIsAlert("firstName");
+    } else if (dataRegister.lastName === "") {
+      setIsAlert("lastName");
+    } else if (dataRegister.email === "") {
+      setIsAlert("email");
+    } else if (dataRegister.password === "") {
+      setIsAlert("password");
+    } else if (dataRegister.confirmPassword === "") {
+      setIsAlert("confirmPassword");
+    } else if (dataRegister.userName === "") {
+      setIsAlert("userName");
+    } else {
+      if (dataRegister.password === dataRegister.confirmPassword) {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (re.test(String(dataRegister.email).toLowerCase())) {
+          setIsLoading(true);
+          register(dataRegister)
+            .then((value) => {
+              console.log("-------------", value.data);
+              if (value.data.code == 200) {
+                //modal สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน
+                setIsLoading(false);
+                setIsRegis(true);
+              }
+            })
+            .catch((err) => console.log("*************", err));
+        } else {
+          setIsAlert("emailFail");
+        }
+      } else {
+        setIsAlert("passwordFail");
+      }
+    }
+  };
+
   return (
     <>
       <Modal
@@ -115,6 +176,11 @@ function RegisterModal({ open, close }) {
       >
         <Box sx={style}>
           <Login>
+            {isLoading && (
+              <DivLoading>
+                <CircularProgress />
+              </DivLoading>
+            )}
             <LoginLeft>
               <ImgLogoLeft src={process.env.PUBLIC_URL + "/whitelogo.png"} />
               <LoginTitle>ยินดีต้อนรับ</LoginTitle>
@@ -123,28 +189,126 @@ function RegisterModal({ open, close }) {
               </LoginDcs>
             </LoginLeft>
             <LoginRight>
-              <LoginText>สมัครสมาชิก</LoginText>
-              <FormContainer>
-                <NameFields>
-                  <NameTextField required label="ชื่อ" defaultValue="" />
-                  <NameTextField required label="นามสกุล" defaultValue="" />
-                </NameFields>
-                <StyledTextField required label="Email" defaultValue="" />
-                <StyledTextField required label="Username" defaultValue="" />
-                <StyledTextField
-                  required
-                  label="Password"
-                  defaultValue=""
-                  type="password"
-                />
-                <StyledTextField
-                  required
-                  label="Confirm Password"
-                  defaultValue=""
-                  type="password"
-                />
-              </FormContainer>
-              <LoginButton>Confirm</LoginButton>
+              {isRegis ? (
+                "สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน"
+              ) : (
+                <>
+                  <LoginText>สมัครสมาชิก</LoginText>
+                  <FormContainer>
+                    <NameFields>
+                      <NameTextField
+                        required
+                        label="ชื่อ"
+                        error={isAlert === "firstName" && true}
+                        onChange={(e) => {
+                          setDataRegister({
+                            ...dataRegister,
+                            firstName: e.target.value,
+                          });
+                          setIsAlert(null);
+                        }}
+                        helperText={
+                          isAlert === "firstName" && "Incorrect entry."
+                        }
+                      />
+                      <NameTextField
+                        required
+                        label="นามสกุล"
+                        error={isAlert === "lastName" && true}
+                        onChange={(e) => {
+                          setDataRegister({
+                            ...dataRegister,
+                            lastName: e.target.value,
+                          });
+                          setIsAlert(null);
+                        }}
+                        helperText={
+                          isAlert === "lastName" && "Incorrect entry."
+                        }
+                      />
+                    </NameFields>
+                    <StyledTextField
+                      required
+                      label="Email"
+                      error={
+                        (isAlert === "email" || isAlert === "emailFail") && true
+                      }
+                      onChange={(e) => {
+                        setDataRegister({
+                          ...dataRegister,
+                          email: e.target.value,
+                        });
+                        setIsAlert(null);
+                      }}
+                      helperText={
+                        isAlert === "email"
+                          ? "Incorrect entry."
+                          : isAlert === "emailFail" && "Invalid email address"
+                      }
+                    />
+                    <StyledTextField
+                      required
+                      label="Username"
+                      error={isAlert === "userName" && true}
+                      onChange={(e) => {
+                        setDataRegister({
+                          ...dataRegister,
+                          userName: e.target.value,
+                        });
+                        setIsAlert(null);
+                      }}
+                      helperText={isAlert === "userName" && "Incorrect entry."}
+                    />
+                    <StyledTextField
+                      required
+                      label="Password"
+                      type="password"
+                      error={
+                        (isAlert === "confirmPassword" ||
+                          isAlert === "passwordFail") &&
+                        true
+                      }
+                      onChange={(e) => {
+                        setDataRegister({
+                          ...dataRegister,
+                          password: e.target.value,
+                        });
+                        setIsAlert(null);
+                      }}
+                      helperText={
+                        isAlert === "password"
+                          ? "Incorrect entry."
+                          : isAlert === "passwordFail" && "password is not math"
+                      }
+                    />
+                    <StyledTextField
+                      required
+                      label="Confirm Password"
+                      type="password"
+                      error={
+                        (isAlert === "confirmPassword" ||
+                          isAlert === "passwordFail") &&
+                        true
+                      }
+                      helperText={
+                        isAlert === "confirmPassword"
+                          ? "Incorrect entry."
+                          : isAlert === "passwordFail" && "password is not math"
+                      }
+                      onChange={(e) => {
+                        setDataRegister({
+                          ...dataRegister,
+                          confirmPassword: e.target.value,
+                        });
+                        setIsAlert(null);
+                      }}
+                    />
+                  </FormContainer>
+                  <LoginButton onClick={() => handleRegister()}>
+                    Confirm
+                  </LoginButton>
+                </>
+              )}
             </LoginRight>
           </Login>
         </Box>

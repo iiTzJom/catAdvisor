@@ -320,7 +320,7 @@ function ManageDataCat() {
                   fullWidth
                   margin="normal"
                   multiline
-                  rows={10}
+                  rows={12}
                   defaultValue={dataCat.descriptionInfo}
                   onChange={(e) =>
                     setDataCat({ ...dataCat, descriptionInfo: e.target.value })

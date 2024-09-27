@@ -18,6 +18,7 @@ import ListBlogPage from "./component/blogList";
 import TextBlogList from "./component/blogDetail";
 import Manage from "./component/manage";
 import ManageAdmin from "./component/admin";
+import ConfirmUserLink from "./component/auth/ConfirmUser";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -51,6 +52,7 @@ root.render(
         <Route path="text-blog-list/:id" element={<TextBlogList />} />
         <Route path="manage" element={<Manage />} />
         <Route path="admin" element={<ManageAdmin />} />
+        <Route path="confirmUser" element={<ConfirmUserLink />} />
       </Routes>
     </BrowserRouter>
     {window.location.pathname.toLocaleUpperCase() !== "/MANAGE" &&

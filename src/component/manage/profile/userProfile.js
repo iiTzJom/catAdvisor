@@ -143,31 +143,6 @@ function UsersProfile() {
 
           <InputRow>
             <InputField
-              label="อายุ"
-              defaultValue="30"
-              variant="standard"
-              InputProps={{
-                readOnly: !isEditable,
-              }}
-            />
-
-            {/* เปลี่ยนจาก TextField เป็น Select */}
-            <Select
-              value={gender}
-              onChange={handleGenderChange}
-              displayEmpty
-              disabled={!isEditable}
-              variant="standard"
-              fullWidth
-            >
-              <MenuItem value="ชาย">ผู้ชาย</MenuItem>
-              <MenuItem value="หญิง">ผู้หญิง</MenuItem>
-              <MenuItem value="อื่นๆ">อื่นๆ</MenuItem>
-            </Select>
-          </InputRow>
-
-          <InputRow>
-            <InputField
               label="Email"
               defaultValue="john.doe@example.com"
               variant="standard"

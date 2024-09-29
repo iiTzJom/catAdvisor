@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import LoginModal from "../component/auth/Login";
 import RegisterModal from "../component/auth/Register";
 import ForgetPassword from "../component/auth/ForgetPass";
+import { sessionService } from "redux-react-session";
 
 const Contain = styled.div`
   padding-left: 240px;
@@ -113,6 +114,33 @@ function Navbar() {
     setIsOpenRegister(false);
     setIsForgetPassword(false);
   }, []);
+
+  const [type, setType] = useState(0);
+
+  sessionService
+    .loadUser()
+    .then((data) => {
+      if (data.type === undefined) {
+        setType(0);
+      } else {
+        setType(data.type);
+      }
+      if (
+        window.location.pathname.toLocaleUpperCase() === "/MANAGE" &&
+        (data.type !== 2 || !data.type)
+      ) {
+        window.location.href = "/";
+      } else if (
+        window.location.pathname.toLocaleUpperCase() === "/ADMIN" &&
+        (data.type !== 1 || !data.type)
+      ) {
+        window.location.href = "/";
+      }
+    })
+    .catch((err) => {
+      window.location.href = "/";
+    });
+
   return (
     <Contain>
       <DivNavbar>
@@ -129,7 +157,27 @@ function Navbar() {
             <AccountCircleIcon onClick={() => setIsOpen(true)} />
             {isOpen && (
               <PopupBody onMouseLeave={() => setIsOpen(false)}>
-                <TextMenu onClick={() => setIsOpenLogin(true)}>Login</TextMenu>
+                {type === 0 && (
+                  <TextMenu onClick={() => setIsOpenLogin(true)}>
+                    Login
+                  </TextMenu>
+                )}
+                {type === 1 && (
+                  <TextMenu
+                    onClick={() =>
+                      (window.location.href = "/Admin?cat-data-list")
+                    }
+                  >
+                    Admin
+                  </TextMenu>
+                )}
+                {type === 2 && (
+                  <TextMenu
+                    onClick={() => (window.location.href = "/Manage?profile")}
+                  >
+                    Manage
+                  </TextMenu>
+                )}
               </PopupBody>
             )}
           </DivIcon>

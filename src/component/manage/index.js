@@ -4,6 +4,8 @@ import UsersProfile from "./profile/userProfile";
 import DataCats from "./catData/dataCat";
 import CatVacine from "./notiVacine/vacine";
 import CatNote from "./note/noteCat";
+import { sessionService } from "redux-react-session";
+import { useState } from "react";
 
 const Contain = styled.div`
   width: 100%;
@@ -21,17 +23,35 @@ const DivBody = styled.div`
   background-color: #71a9db;
 `;
 function Manage() {
+  const [type, setType] = useState(0);
+
+  sessionService
+    .loadUser()
+    .then((data) => {
+      if (data.type === undefined) {
+        setType(0);
+      } else {
+        setType(data.type);
+      }
+    })
+    .catch((err) => {
+      window.location.href = "/";
+    });
   return (
     <Contain>
-      <DivSidebar>
-        <Sidebars />
-      </DivSidebar>
-      <DivBody>
-        {window.location.search === "?profile" && <UsersProfile />}
-        {window.location.search === "?catData" && <DataCats />}
-        {window.location.search === "?notiVacine" && <CatVacine />}
-        {window.location.search === "?note" && <CatNote />}
-      </DivBody>
+      {type === 2 && (
+        <>
+          <DivSidebar>
+            <Sidebars />
+          </DivSidebar>
+          <DivBody>
+            {window.location.search === "?profile" && <UsersProfile />}
+            {window.location.search === "?catData" && <DataCats />}
+            {window.location.search === "?notiVacine" && <CatVacine />}
+            {window.location.search === "?note" && <CatNote />}
+          </DivBody>
+        </>
+      )}
     </Contain>
   );
 }

@@ -13,3 +13,9 @@ export const checkConfirmUserApi = async (data) => {
 export const confirmUserApi = async (data) => {
   return axios.put(`http://localhost:3001/confirmUser`, data);
 };
+
+export const login = async (data) => {
+  return axios.get(
+    `http://localhost:3001/getUser?userName=${data.userName}&password=${data.password}`
+  );
+};

@@ -3,7 +3,10 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PetsIcon from "@mui/icons-material/Pets";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NoteIcon from "@mui/icons-material/Note";
-
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../../../redux/action/userActions";
+import { useState } from "react";
+import { sessionService } from "redux-react-session";
 const Contain = styled.div`
   display: flex;
   flex-direction: column;
@@ -95,6 +98,18 @@ const LogoutButton = styled.div`
 `;
 
 function Sidebars() {
+  const dispatch = useDispatch();
+  const [name, setName] = useState(null);
+
+  sessionService
+    .loadUser()
+    .then((data) => {
+      setName(data.firstName + " " + data.lastName);
+    })
+    .catch((err) => {
+      window.location.href = "/";
+    });
+
   const menu = [
     {
       path: "?profile",
@@ -123,7 +138,8 @@ function Sidebars() {
   };
 
   const handleLogout = () => {
-    console.log("Logout");
+    dispatch(logoutUser());
+    window.location.href = "/";
   };
 
   return (
@@ -150,7 +166,7 @@ function Sidebars() {
         </DivMenu>
         <BottomSection>
           <ProfileIcon />
-          <ProfileTag>Tag ID: 12345</ProfileTag>
+          <ProfileTag>{name}</ProfileTag>
           <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </BottomSection>
       </ContainInside>

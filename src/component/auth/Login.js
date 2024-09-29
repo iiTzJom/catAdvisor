@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import styled from "@emotion/styled/macro";
@@ -11,6 +11,15 @@ import InputLabel from "@mui/material/InputLabel";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import { login } from "../../api/auth";
+import { loginUser } from "../../redux/action/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import { imgDB } from "../../fireBase/UploadImg";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+import { sessionService } from "redux-react-session";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 
 const style = {
   position: "absolute",
@@ -114,11 +123,65 @@ const RegisterText = styled.div`
 `;
 
 function LoginModal({ open, close, register, forgetpassword }) {
+  const { isLang, userName } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [dataLogin, setDataLogin] = useState({
+    userName: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
-
+  const [isAlert, setIsAlert] = useState(null);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
+  const [message, setMessage] = useState(null);
 
+  const handleLogin = () => {
+    if (dataLogin.userName === "") {
+      setIsAlert("userName");
+    } else if (dataLogin.password === "") {
+      setIsAlert("password");
+    } else {
+      login(dataLogin)
+        .then(({ data }) => {
+          if (data.code === 200) {
+            if (data.message === "login success") {
+              const dataUser = data.data;
+              dispatch(
+                loginUser(
+                  dataUser.userName,
+                  dataUser.id,
+                  dataUser.firstName,
+                  dataUser.lastName,
+                  dataUser.email,
+                  dataUser.imgProfile,
+                  dataUser.type
+                )
+              );
+
+              if (dataUser.type === 1) {
+                window.location.href = "/Admin?cat-data-list";
+              } else if (dataUser.type === 2) {
+                window.location.href = "/Manage?profile";
+              }
+            } else {
+              setMessage(data.message);
+            }
+          }
+        })
+        .catch((e) => setMessage("login fail"));
+    }
+  };
+
+  const aaa = async (data) => {
+    const id = v4();
+    const imgRef = ref(imgDB, `files/${id}`);
+    await uploadBytes(imgRef, data).then((value) =>
+      getDownloadURL(value.ref).then((url) => {
+        console.log("id", id);
+        console.log("aaaaaaaaaaaaaa", url);
+      })
+    );
+  };
   return (
     <Modal
       open={open}
@@ -140,13 +203,20 @@ function LoginModal({ open, close, register, forgetpassword }) {
               id="outlined-required"
               label="Username"
               defaultValue=""
+              onChange={(e) => {
+                setDataLogin({ ...dataLogin, userName: e.target.value });
+                setMessage(null);
+              }}
+              error={isAlert === "userName" && true}
             />
+            {/* <input type="file" onChange={(e) => aaa(e.target.files[0])} /> */}
             <FormControl sx={{ width: "425px" }} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-password">
                 Password
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password"
+                error={isAlert === "password" && true}
                 type={showPassword ? "text" : "password"}
                 endAdornment={
                   <InputAdornment position="end">
@@ -161,12 +231,23 @@ function LoginModal({ open, close, register, forgetpassword }) {
                   </InputAdornment>
                 }
                 label="Password"
+                onChange={(e) => {
+                  setDataLogin({ ...dataLogin, password: e.target.value });
+                  setMessage(null);
+                }}
               />
             </FormControl>
             <ForgotPassword onClick={forgetpassword}>
               Reset Password
             </ForgotPassword>
-            <LoginButton>ล็อกอิน</LoginButton>
+            {message === "login fail" && (
+              <Stack sx={{ width: "100%" }} spacing={2}>
+                <Alert severity="error">
+                  เข้าสู่ระบบไม่สำเร็จกรุณาลองใหม่อีกครั้ง
+                </Alert>
+              </Stack>
+            )}
+            <LoginButton onClick={() => handleLogin()}>ล็อกอิน</LoginButton>
             <RegisterText onClick={register}>
               ยังไม่มีบัญชี? Create Account
             </RegisterText>

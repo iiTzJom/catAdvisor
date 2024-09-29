@@ -47,7 +47,7 @@ function ConfirmUserLink() {
       <DivIconLoading>
         {isChkStatus === null && <CircularProgress />}
         {isChkStatus === true && dataReturn === "success" && (
-          <>update success</>
+          <>vertify success</>
         )}
         {isChkStatus === false && <>404</>}
       </DivIconLoading>

@@ -16,6 +16,16 @@ export const confirmUserApi = async (data) => {
 
 export const login = async (data) => {
   return axios.get(
-    `http://localhost:3001/getUser?userName=${data.userName}&password=${data.password}`
+    `http://localhost:3001/login?userName=${data.userName}&password=${data.password}`
   );
+};
+
+export const checkUsernameResetPassword = async (data) => {
+  return axios.get(
+    `http://localhost:3001/checkUsernameResetPassword?userName=${data.userName}`
+  );
+};
+
+export const updatePassword = async (data) => {
+  return axios.put(`http://localhost:3001/updatePassword`, data);
 };

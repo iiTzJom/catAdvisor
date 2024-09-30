@@ -3,7 +3,9 @@ import Modal from "@mui/material/Modal";
 import styled from "@emotion/styled/macro";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-
+import { checkUsernameResetPassword } from "../../api/auth";
+import { useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
 const style = {
   position: "absolute",
   textAlign: "center",
@@ -63,7 +65,33 @@ const BackToLogin = styled.div`
   text-decoration: underline;
 `;
 
+const DivIconLoading = styled.div`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+`;
 function ForgetPassword({ open, close, backtologin }) {
+  const [userName, setUserName] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [isReset, setIsReset] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const resetPassword = () => {
+    if (userName !== "") {
+      setIsLoading(true);
+      checkUsernameResetPassword({ userName: userName })
+        .then(({ data }) => {
+          if (data.code === 200 && data.message === "success") {
+            setIsReset(true);
+          }
+          setIsLoading(false);
+        })
+
+        .catch((err) => err);
+    } else {
+      setIsError(true);
+    }
+  };
   return (
     <Modal
       open={open}
@@ -74,20 +102,34 @@ function ForgetPassword({ open, close, backtologin }) {
       <Box sx={style}>
         <Logo src={process.env.PUBLIC_URL + "/CatAdvisorLogo.png"} />
         <Title>ลืมรหัสผ่าน?</Title>
-        <Box>
-          <StyledTextField
-            required
-            id="outlined-required"
-            label="Email"
-            type="email"
-          />
-        </Box>
-        <DivButton>
-          <ResetButton>Send Reset Password</ResetButton>
-        </DivButton>
-        <BackToLogin onClick={() => backtologin(false)}>
-          กลับไปยังหน้า Login
-        </BackToLogin>
+        <DivIconLoading>{isLoading && <CircularProgress />}</DivIconLoading>
+
+        {isReset ? (
+          "ระบบได้ทำการส่งลิ้งค์เพื่อ reset password ไปยังอีเมลของท่านแล้วกรุณาตรวจสอบที่ e-mail ของท่าน"
+        ) : (
+          <>
+            <Box>
+              <StyledTextField
+                required
+                id="outlined-required"
+                label="Username"
+                onChange={(e) => {
+                  setUserName(e.target.value);
+                  setIsError(false);
+                }}
+                error={isError}
+              />
+            </Box>
+            <DivButton>
+              <ResetButton onClick={() => resetPassword()}>
+                Send Reset Password
+              </ResetButton>
+            </DivButton>
+            <BackToLogin onClick={() => backtologin(false)}>
+              กลับไปยังหน้า Login
+            </BackToLogin>
+          </>
+        )}
       </Box>
     </Modal>
   );

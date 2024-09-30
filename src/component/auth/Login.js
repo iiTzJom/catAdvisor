@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { imgDB } from "../../fireBase/UploadImg";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
-import { sessionService } from "redux-react-session";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 
@@ -245,6 +244,11 @@ function LoginModal({ open, close, register, forgetpassword }) {
                 <Alert severity="error">
                   เข้าสู่ระบบไม่สำเร็จกรุณาลองใหม่อีกครั้ง
                 </Alert>
+              </Stack>
+            )}
+            {message === "password is not correct" && (
+              <Stack sx={{ width: "100%" }} spacing={2}>
+                <Alert severity="error">รหัสผ่านไม่ถูกต้อง</Alert>
               </Stack>
             )}
             <LoginButton onClick={() => handleLogin()}>ล็อกอิน</LoginButton>

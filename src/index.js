@@ -20,6 +20,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./redux/store";
 import { sessionService } from "redux-react-session";
 import Forbidden from "./component/notFoundPage/403";
+import ResetPassword from "./component/auth/ResetPasswordPage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -76,6 +77,7 @@ root.render(
           <Route path="admin" element={<ManageAdmin />} />
           <Route path="confirmUser" element={<ConfirmUserLink />} />
           <Route path="403" element={<Forbidden />} />
+          <Route path="resetPassword" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
       {window.location.pathname.toLocaleUpperCase() !== "/MANAGE" &&

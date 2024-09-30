@@ -2,7 +2,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import styled from "@emotion/styled/macro";
 import { useEffect, useState } from "react";
 import { checkConfirmUserApi, confirmUserApi } from "../../api/auth";
-import { is } from "date-fns/locale/is";
+
 const Contain = styled.div`
   max-width: 100%;
   display: flex;

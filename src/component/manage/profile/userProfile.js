@@ -145,10 +145,8 @@ function UsersProfile() {
             <InputField
               label="Email"
               defaultValue="john.doe@example.com"
+              disabled={true}
               variant="standard"
-              InputProps={{
-                readOnly: !isEditable,
-              }}
             />
           </InputRow>
 

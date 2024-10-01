@@ -171,16 +171,6 @@ function LoginModal({ open, close, register, forgetpassword }) {
     }
   };
 
-  const aaa = async (data) => {
-    const id = v4();
-    const imgRef = ref(imgDB, `files/${id}`);
-    await uploadBytes(imgRef, data).then((value) =>
-      getDownloadURL(value.ref).then((url) => {
-        console.log("id", id);
-        console.log("aaaaaaaaaaaaaa", url);
-      })
-    );
-  };
   return (
     <Modal
       open={open}
@@ -208,7 +198,7 @@ function LoginModal({ open, close, register, forgetpassword }) {
               }}
               error={isAlert === "userName" && true}
             />
-            {/* <input type="file" onChange={(e) => aaa(e.target.files[0])} /> */}
+
             <FormControl sx={{ width: "425px" }} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-password">
                 Password

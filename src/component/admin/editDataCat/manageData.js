@@ -252,8 +252,6 @@ function ManageDataCat() {
     },
   ];
 
-  console.log("dataCatdataCatdataCat::", dataCat.descriptionInfo);
-
   return (
     <Container>
       <DivStep>

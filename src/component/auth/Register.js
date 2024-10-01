@@ -128,7 +128,6 @@ function RegisterModal({ open, close }) {
   const [isAlert, setIsAlert] = useState(null);
   const [isRegis, setIsRegis] = useState(false);
   const handleRegister = () => {
-    console.log("dataRegister", dataRegister);
     if (dataRegister.firstName === "") {
       setIsAlert("firstName");
     } else if (dataRegister.lastName === "") {
@@ -149,14 +148,13 @@ function RegisterModal({ open, close }) {
           setIsLoading(true);
           register(dataRegister)
             .then((value) => {
-              console.log("-------------", value.data);
               if (value.data.code == 200) {
                 //modal สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน
                 setIsLoading(false);
                 setIsRegis(true);
               }
             })
-            .catch((err) => console.log("*************", err));
+            .catch((err) => err);
         } else {
           setIsAlert("emailFail");
         }

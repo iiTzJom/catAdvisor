@@ -222,7 +222,6 @@ const CatNote = () => {
   };
 
   const handleDeleteNote = (tagId) => {
-    console.log(`Deleted note with Tag ID: ${tagId}`);
     handleDropdownClose();
   };
 

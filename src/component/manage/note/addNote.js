@@ -42,7 +42,6 @@ const AddNotes = ({ open, onClose, note }) => {
   };
 
   const handleSave = () => {
-    console.log("Saved data:", formData);
     onClose();
   };
 

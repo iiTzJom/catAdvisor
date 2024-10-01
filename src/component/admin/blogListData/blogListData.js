@@ -4,7 +4,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Button, MenuItem } from "@mui/material";
 import { getBlogList, deleteBlog } from "../../../api/blog";
 
 // Styles for the main container and card components
@@ -135,53 +135,26 @@ const DivMenu = styled.div`
   border-radius: 5px;
 `;
 
-const FilterWrapper = styled.div`
-  margin-bottom: 20px;
-`;
-
-const categories = [
-  {
-    id: "01J61ZZFHKFEKX8DYHJNC2E8YD",
-    name: "ลักษณะพิเศษต่างๆของแมว",
-    icon: "/caticon.png",
-  },
-  {
-    id: "01J61ZZFHK6ZY1W6GBY0JV2FGC",
-    name: "การเลี้ยงดู",
-    icon: "/heart_3319163.png",
-  },
-  {
-    id: "01J61ZZFHMYDYFTGDF6AK659PW",
-    name: "อุปกรณ์/สิ่งจำเป็น",
-    icon: "/foodicon.png",
-  },
-  {
-    id: "01J61ZZFHJAYM56B6JV9ZSQW0E",
-    name: "โรคทั่วไปของเเมว",
-    icon: "/medicon.png",
-  },
-  {
-    id: "01J61ZZFHK6ZY1W6GBY0JV2H4X",
-    name: "ประสบการณ์จากผู้พัฒนา",
-    icon: "/bookicon.png",
-  },
-];
-
 function BlogDataList() {
   const [isOpenMenu, setIsOpenMenu] = useState(null);
   const [dataBlogs, setDataBlogs] = useState([]);
 
-  useEffect(async () => {
-    await getBlogList()
+  useEffect(() => {
+    var newData = [];
+    const getData = getBlogList()
       .then((data) => {
         if (data?.data?.code === 200) {
-          var result = Object.keys(data?.data?.data).map((key) => [
-            data?.data?.data[key],
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
           ]);
-          setDataBlogs(result);
+          setDataBlogs(newData);
         }
       })
       .catch((err) => err);
+
+    return () => {
+      clearInterval(getData); // ใช้ clearInterval แทน destroy
+    };
   }, []);
 
   const deleteData = (id) => {
@@ -207,24 +180,24 @@ function BlogDataList() {
         </DivButtonAdd>
         <CardList>
           {dataBlogs?.map((blog, i) => (
-            <Card key={blog[0]?.id}>
-              <CardImage src={blog[0]?.imgCat} alt={blog[0]?.title} />
-              <CardTitle>{blog[0]?.title}</CardTitle>
-              <CardDescription>{blog[0]?.description}</CardDescription>
+            <Card key={blog?.id}>
+              <CardImage src={blog?.imgCat} alt={blog?.title} />
+              <CardTitle>{blog?.title}</CardTitle>
+              <CardDescription>{blog?.description}</CardDescription>
               <IconWrapper>
-                <MoreHorizIcon onClick={() => setIsOpenMenu(blog[0]?.id)} />
+                <MoreHorizIcon onClick={() => setIsOpenMenu(blog?.id)} />
 
-                {isOpenMenu === blog[0]?.id && (
+                {isOpenMenu === blog?.id && (
                   <DivMenu onMouseLeave={() => setIsOpenMenu(null)}>
                     <MenuItem
                       onClick={() =>
-                        (window.location.href = "/Admin?blogCatData")
+                        (window.location.href = `/Admin?blogCatData&id=${blog?.id}`)
                       }
                     >
                       <EditIcon style={{ marginRight: "8px" }} />
                       แก้ไข
                     </MenuItem>
-                    <MenuItem onClick={() => deleteData(blog[0]?.id)}>
+                    <MenuItem onClick={() => deleteData(blog?.id)}>
                       <DeleteIcon style={{ marginRight: "8px" }} />
                       ลบ
                     </MenuItem>
@@ -232,7 +205,7 @@ function BlogDataList() {
                 )}
               </IconWrapper>
               <DivReccommend>
-                {blog[0].recommend && <Reccommend>เเนะนำ</Reccommend>}
+                {blog?.recommend && <Reccommend>เเนะนำ</Reccommend>}
               </DivReccommend>
             </Card>
           ))}

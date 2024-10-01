@@ -130,7 +130,6 @@ const AddCatModal = ({
       });
     }
   }, [catData]);
-  console.log("catData::", dataCat);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];

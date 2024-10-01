@@ -109,7 +109,6 @@ function Navbar() {
     setIsOpenLogin(false);
   }, []);
   const handleBackToLogin = useCallback(() => {
-    console.log("+++++++");
     setIsOpenLogin(true);
     setIsOpenRegister(false);
     setIsForgetPassword(false);

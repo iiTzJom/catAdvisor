@@ -152,8 +152,8 @@ function AdminSidebars() {
             <DivButton
               key={i}
               focus={
-                (window.location.search === data.path ||
-                  window.location.search === data.pathEdit) &&
+                (window.location.search.indexOf(data.path) === 0 ||
+                  window.location.search.indexOf(data.pathEdit) === 0) &&
                 "#1860C3"
               }
               onClick={() => (window.location.href = "/admin" + data.path)}

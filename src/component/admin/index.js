@@ -49,7 +49,11 @@ function ManageAdmin() {
               <AddEditDataCat />
             )}
             {window.location.search === "?blog-data-list" && <BlogDataList />}
-            {window.location.search === "?blogCatData" && <BlogDataAdd />}
+            {(window.location.search === "?blogCatData" ||
+              (window.location.search.split("&").length === 2 &&
+                window.location.search.split("&")[1]?.indexOf("id") === 0)) && (
+              <BlogDataAdd />
+            )}
           </DivBody>
         </>
       )}

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled/macro";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -15,7 +15,7 @@ import {
 import ReactHtmlParser from "react-html-parser";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import { createBlog } from "../../../api/blog";
+import { createBlog, getBlogDetail, updateBlogDetail } from "../../../api/blog";
 import { sessionService } from "redux-react-session";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
@@ -86,6 +86,13 @@ const AdditionalDetailsWrapper = styled.div`
 
 const HiddenInput = styled.input`
   display: none;
+  background-color: red;
+  width: 100%;
+  position: absolute;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
 `;
 
 const DivIconLoading = styled.div`
@@ -150,6 +157,10 @@ const DivName = styled.div`
   margin-top: 40px;
 `;
 
+const ShowImg = styled.img`
+  width: 100%;
+  max-height: 300px;
+`;
 const categories = [
   {
     id: "01J61ZZFHKFEKX8DYHJNC2E8YD",
@@ -192,9 +203,11 @@ function BlogDataAdd() {
   const [checkDataEmpty, setCheckDataEmpty] = useState(false);
   const [imgFile, setImgfile] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [idBlog, setIdBlog] = useState(null);
   const handleImageUpload = (e) => {
     setCheckDataEmpty(false);
     setImgfile(e.target.files[0]);
+
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(URL.createObjectURL(file));
@@ -218,16 +231,28 @@ function BlogDataAdd() {
       window.location.href = "/";
     });
 
-  const uploadImgToFirebase = async (data) => {
-    const id = v4();
-    const imgRef = ref(imgDB, `imgBlogs/${id}`);
-    await uploadBytes(imgRef, data).then((value) =>
-      getDownloadURL(value.ref).then((url) => {
-        console.log("urlurl", url);
-        return url;
-      })
-    );
-  };
+  useEffect(() => {
+    if (window.location.search.split("?blogCatData&id=").length === 2) {
+      const getData = getBlogDetail(
+        window.location.search.split("?blogCatData&id=")[1]
+      ).then((data) => {
+        if (data.data.code === 200) {
+          setSelectedImage(data.data.data.imgCat);
+          setIsRecommend(data.data.data.recommend);
+          setDataCat({
+            descriptionInfo: data.data.data.description,
+            title: data.data.data.title,
+          });
+          setSelectedCategory(data.data.data.cateId);
+          setIdBlog(data.data.data.id);
+        }
+      });
+
+      return () => {
+        clearInterval(getData); // ใช้ clearInterval แทน destroy
+      };
+    }
+  }, []);
 
   const create = async () => {
     setIsLoading(true);
@@ -256,7 +281,6 @@ function BlogDataAdd() {
       const imgRef = ref(imgDB, `imgBlogs/${id}`);
       await uploadBytes(imgRef, imgFile).then((value) =>
         getDownloadURL(value.ref).then((url) => {
-          console.log("urlurl", url);
           dataSave.imgCat = url;
         })
       );
@@ -265,6 +289,48 @@ function BlogDataAdd() {
           if (
             data.data.code === 200 &&
             data.data.message === "create success"
+          ) {
+            window.location.href = "/admin?blog-data-list";
+          }
+        })
+        .catch((err) => err);
+    }
+    setIsLoading(false);
+  };
+
+  const update = async () => {
+    setIsLoading(true);
+    var dataSave = {
+      cateId: selectedCategory,
+      imgCat: selectedImage,
+      recommend: isRecommend,
+      description: dataCat.descriptionInfo,
+      updateBy: user,
+      title: dataCat.title,
+      id: idBlog,
+    };
+    if (
+      dataSave.cateId === "" ||
+      dataSave.recommend === "" ||
+      dataSave.description === "" ||
+      dataSave.title === ""
+    ) {
+      setCheckDataEmpty(true);
+    } else {
+      const id = v4();
+      const imgRef = ref(imgDB, `imgBlogs/${id}`);
+      if (imgFile !== "") {
+        await uploadBytes(imgRef, imgFile).then((value) =>
+          getDownloadURL(value.ref).then((url) => {
+            dataSave.imgCat = url;
+          })
+        );
+      }
+      await updateBlogDetail(dataSave)
+        .then((data) => {
+          if (
+            data.data.code === 200 &&
+            data.data.message === "Update Success"
           ) {
             window.location.href = "/admin?blog-data-list";
           }
@@ -298,6 +364,7 @@ function BlogDataAdd() {
                     setDataCat({ ...dataCat, title: e.target.value });
                     setCheckDataEmpty(false);
                   }}
+                  value={dataCat.title}
                   //error={isError}
                 />
               </Box>
@@ -318,21 +385,21 @@ function BlogDataAdd() {
               onClick={() => document.getElementById("imageUpload").click()}
             >
               <DivIconUpload>
-                <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
-                <p>อัปโหลดรูปภาพ</p>
+                {selectedImage !== null ? (
+                  <ShowImg src={selectedImage} alt="Selected" />
+                ) : (
+                  <>
+                    <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+                    <p>อัปโหลดรูปภาพ</p>
+                  </>
+                )}
+
                 <HiddenInput
                   id="imageUpload"
                   type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
                 />
-                {selectedImage && (
-                  <img
-                    src={selectedImage}
-                    alt="Selected"
-                    style={{ width: "80px", marginTop: "10px" }}
-                  />
-                )}
               </DivIconUpload>
             </UploadBox>
           </DivLeft>
@@ -345,7 +412,7 @@ function BlogDataAdd() {
                 margin="normal"
                 multiline
                 rows={12}
-                defaultValue={dataCat.descriptionInfo}
+                value={dataCat.descriptionInfo}
                 onChange={(e) => {
                   setDataCat({ ...dataCat, descriptionInfo: e.target.value });
                   setCheckDataEmpty(false);
@@ -382,7 +449,11 @@ function BlogDataAdd() {
           <ButtonNextPrev
             bg={"#B6C4A0"}
             bgHover={"#98af74"}
-            onClick={() => create()}
+            onClick={() => {
+              window.location.search.split("?blogCatData&id=").length === 2
+                ? update()
+                : create();
+            }}
           >
             เพิ่มข้อมูล
           </ButtonNextPrev>

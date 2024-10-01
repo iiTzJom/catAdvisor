@@ -1,6 +1,7 @@
+import React, { useEffect, useState } from "react";
 import styled from "@emotion/styled/macro";
 import ReactHtmlParser from "react-html-parser";
-
+import { getBlogDetail } from "../../api/blog";
 const Contain = styled.div`
   max-width: 100%;
   display: flex;
@@ -37,6 +38,7 @@ const DivRec = styled.div`
   width: 100%;
   margin-top: 40px;
   display: flex;
+  margin-bottom: 20px;
 `;
 
 const DcsDetial = styled.div`
@@ -72,32 +74,59 @@ const DivCatagory = styled.div`
 `;
 
 function TextDetail({ data }) {
+  const [dataCat, setDataCat] = useState({
+    imgCat: "",
+    title: "",
+    recommend: false,
+    description: "",
+    cateId: "",
+  });
+  useEffect(async () => {
+    const getData = await getBlogDetail(window.location.search.slice(1)).then(
+      (data) => {
+        if (data.data.code === 200) {
+          setDataCat({
+            imgCat: data.data.data.imgCat,
+            title: data.data.data.title,
+            recommend: data.data.data.recommend,
+            description: data.data.data.description,
+            cateId: data.data.data.cateId,
+          });
+        }
+      }
+    );
+
+    return () => {
+      clearInterval(getData); // ใช้ clearInterval แทน destroy
+    };
+  }, []);
+
   return (
     <Contain>
       <DivRight>
-        <ImageDetailCat src={process.env.PUBLIC_URL + data.pic} />
+        <ImageDetailCat src={process.env.PUBLIC_URL + dataCat?.imgCat} />
       </DivRight>
       <DivLeft>
         <DivRec>
-          {data.recommend && <Reccommend>เเนะนำ</Reccommend>}{" "}
-          {data.id_cate == "01J61ZZFHJAYM56B6JV9ZSQW0E" && (
+          {dataCat?.recommend && <Reccommend>เเนะนำ</Reccommend>}{" "}
+          {dataCat?.cateId == "01J61ZZFHJAYM56B6JV9ZSQW0E" && (
             <DivCatagory background={"/medicon.png"} />
           )}
-          {data.id_cate == "01J61ZZFHK6ZY1W6GBY0JV2H4X" && (
+          {dataCat?.cateId == "01J61ZZFHK6ZY1W6GBY0JV2H4X" && (
             <DivCatagory background={"/bookicon.png"} />
           )}
-          {data.id_cate == "01J61ZZFHKFEKX8DYHJNC2E8YD" && (
+          {dataCat?.cateId == "01J61ZZFHKFEKX8DYHJNC2E8YD" && (
             <DivCatagory background={"/caticon.png"} />
           )}
-          {data.id_cate == "01J61ZZFHMYDYFTGDF6AK659PW" && (
+          {dataCat?.cateId == "01J61ZZFHMYDYFTGDF6AK659PW" && (
             <DivCatagory background={"/foodicon.png"} />
           )}
-          {data.id_cate == "01J61ZZFHK6ZY1W6GBY0JV2FGC" && (
+          {dataCat?.cateId == "01J61ZZFHK6ZY1W6GBY0JV2FGC" && (
             <DivCatagory background={"/heart_3319163.png"} />
           )}
         </DivRec>
-        <TiTleDetail>{data.title}</TiTleDetail>
-        <DcsDetial>{ReactHtmlParser(data.dcs)}</DcsDetial>
+        <TiTleDetail>{dataCat?.title}</TiTleDetail>
+        <DcsDetial>{ReactHtmlParser(dataCat?.description)}</DcsDetial>
       </DivLeft>
     </Contain>
   );

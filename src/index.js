@@ -72,7 +72,7 @@ root.render(
           <Route path="map" element={<Map />} />
           <Route path="cat-breeds-list" element={<CatBreed />} />
           <Route path="cat-breeds-detail/:id" element={<CatBreedDetail />} />
-          <Route path="text-blog-list/:id" element={<TextBlogList />} />
+          <Route path="text-blog-list" element={<TextBlogList />} />
           <Route path="manage" element={<Manage />} />
           <Route path="admin" element={<ManageAdmin />} />
           <Route path="confirmUser" element={<ConfirmUserLink />} />

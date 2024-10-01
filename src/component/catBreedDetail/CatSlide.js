@@ -57,7 +57,7 @@ function SlideCat({ data }) {
       items: 1,
     },
   };
-  console.log("*********", data);
+
   return (
     <Contain>
       <Carousel responsive={responsive}>

@@ -33,7 +33,7 @@ function ManageAdmin() {
       }
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
 
   return (

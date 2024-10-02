@@ -24,7 +24,7 @@ const DivBody = styled.div`
 `;
 function Manage() {
   const [type, setType] = useState(0);
-
+  const [name, setName] = useState("");
   sessionService
     .loadUser()
     .then((data) => {
@@ -32,11 +32,13 @@ function Manage() {
         setType(0);
       } else {
         setType(data.type);
+        setName(data.userName);
       }
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
+
   return (
     <Contain>
       {type === 2 && (
@@ -45,8 +47,10 @@ function Manage() {
             <Sidebars />
           </DivSidebar>
           <DivBody>
-            {window.location.search === "?profile" && <UsersProfile />}
-            {window.location.search === "?catData" && <DataCats />}
+            {window.location.search === "?profile" && (
+              <UsersProfile name={name} />
+            )}
+            {window.location.search === "?catData" && <DataCats name={name} />}
             {window.location.search === "?notiVacine" && <CatVacine />}
             {window.location.search === "?note" && <CatNote />}
           </DivBody>

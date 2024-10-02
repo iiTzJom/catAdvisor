@@ -29,3 +29,11 @@ export const checkUsernameResetPassword = async (data) => {
 export const updatePassword = async (data) => {
   return axios.put(`http://localhost:3001/updatePassword`, data);
 };
+
+export const updateProfile = async (data) => {
+  return axios.put(`http://localhost:3001/updateProfile`, data);
+};
+
+export const getProfile = async (data) => {
+  return axios.get(`http://localhost:3001/getProfile?userName=${data}`);
+};

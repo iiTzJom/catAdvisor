@@ -137,7 +137,7 @@ function Navbar() {
       }
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
 
   return (

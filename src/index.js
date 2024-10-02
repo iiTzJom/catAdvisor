@@ -54,7 +54,7 @@ sessionService
     }
   })
   .catch((err) => {
-    window.location.href = "/";
+    //window.location.href = "/";
   });
 
 root.render(

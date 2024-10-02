@@ -228,7 +228,7 @@ function BlogDataAdd() {
       setUser(data.userName);
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
 
   useEffect(() => {

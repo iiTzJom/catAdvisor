@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import AddCatModal from "./addCat";
 import EditCatModal from "./editCat";
-
+import { getCatByUser, deleteCatByUser } from "../../../api/userCatData";
 const Container = styled.div`
   background-color: #71a9db;
   max-height: 100vh;
@@ -54,8 +54,8 @@ const CardAvatarContainer = styled.div`
 `;
 
 const CardAvatar = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
   background-color: #ccc; /* กรณีไม่มีรูปภาพ */
@@ -94,88 +94,58 @@ const CardButton = styled(Button)`
 `;
 
 const calculateAge = (birthDate) => {
-  const now = new Date();
+  const today = new Date();
   const birth = new Date(birthDate);
-  let years = now.getFullYear() - birth.getFullYear();
-  let months = now.getMonth() - birth.getMonth();
 
-  if (months < 0 || (months === 0 && now.getDate() < birth.getDate())) {
-    years--;
-    months += 12;
-  }
+  const age = today.getFullYear() - birth.getFullYear(); // คำนวณปี
 
-  const totalMonths = years * 12 + months;
-  return {
-    years,
-    months,
-    totalMonths,
-  };
+  const monthDiff = today.getMonth() - birth.getMonth(); // คำนวณเดือน
+
+  // ตรวจสอบหากยังไม่ถึงวันเกิดในปีนี้ ให้ลดอายุลง 1 ปี
+  // if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+  //   age--;
+  // }
+
+  return age + " ปี" + " " + monthDiff + " เดือน";
 };
 
-function DataCats() {
-  const [catsData, setCatsData] = useState([
-    {
-      id: 1,
-      name: "ฟุกุ",
-      breed: "สก็อตติช โฟลด์",
-      gender: "ผู้",
-      birthDate: "2022-07-11",
-      statusColor: "orange",
-      avatar: "https://via.placeholder.com/100", // ลิงก์รูป placeholder
-    },
-    {
-      id: 2,
-      name: "เลโอ",
-      breed: "อเมริกัน ช็อตแฮร์",
-      gender: "เมีย",
-      birthDate: "2022-07-11",
-      statusColor: "green",
-      avatar: "https://via.placeholder.com/100", // ลิงก์รูป placeholder
-    },
-  ]);
+function DataCats({ name }) {
+  const [catsData, setCatsData] = useState([]);
+
+  useEffect(() => {
+    var newData = [];
+    const getData = getCatByUser(name)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
+          ]);
+          setCatsData(newData);
+          // setDataDB(newData);
+        }
+      })
+      .catch((err) => err);
+
+    return () => {
+      clearInterval(getData); // ใช้ clearInterval แทน destroy
+    };
+  }, []);
 
   const [isAddCatModalOpen, setIsAddCatModalOpen] = useState(false);
-  const [isEditCatModalOpen, setIsEditCatModalOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState(null);
   const [typeModal, setTypeModal] = useState("Create");
 
   const openAddCatModal = () => setIsAddCatModalOpen(true);
   const closeAddCatModal = () => setIsAddCatModalOpen(false);
 
-  const openEditCatModal = (cat) => {
-    setSelectedCat(cat);
-    setIsEditCatModalOpen(true);
-  };
-  const closeEditCatModal = () => setIsEditCatModalOpen(false);
-
-  const handleAddCat = (newCat) => {
-    const newId =
-      catsData.length > 0 ? Math.max(catsData.map((cat) => cat.id)) + 1 : 1;
-    const catWithId = { ...newCat, id: newId };
-    setCatsData([...catsData, catWithId]);
-    closeAddCatModal();
-  };
-
-  const handleEditCat = (updatedCat) => {
-    setCatsData(
-      catsData.map((cat) => (cat.id === updatedCat.id ? updatedCat : cat))
-    );
-    closeEditCatModal();
-  };
-
-  // ฟังก์ชันอัปเดตอวาตาร์
-  const handleAvatarChange = (e, catId) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const updatedCats = catsData.map((cat) =>
-          cat.id === catId ? { ...cat, avatar: reader.result } : cat
-        );
-        setCatsData(updatedCats);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handelDelete = (id) => {
+    deleteCatByUser(name, id)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          window.location.href = "/Manage?catData";
+        }
+      })
+      .catch((err) => err);
   };
 
   return (
@@ -199,37 +169,25 @@ function DataCats() {
             const { years, months, totalMonths } = calculateAge(cat.birthDate);
             return (
               <Card key={cat.id}>
-                {/* วงกลมสำหรับแสดงรูปแมว */}
                 <CardAvatarContainer>
-                  <CardAvatar src={cat.avatar} alt={`รูปของ ${cat.name}`} />
-
-                  {/* ปุ่มสำหรับอัปโหลดรูป */}
-                  {/* <UploadButton htmlFor={`avatar-upload-${cat.id}`}>
-                    <PhotoCameraIcon color="primary" />
-                    <HiddenInput
-                      id={`avatar-upload-${cat.id}`}
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleAvatarChange(e, cat.id)}
-                    />
-                  </UploadButton> */}
+                  <CardAvatar src={cat.imgCat} />
                 </CardAvatarContainer>
 
                 <CardContent>
-                  <h3>{cat.name}</h3>
-                  <p>{cat.breed}</p>
-                  <p>เพศ: {cat.gender}</p>
+                  <h3>{cat.nameCat}</h3>
+                  <p>{cat.breedCat}</p>
+                  <p>เพศ: {cat.genderCat}</p>
+                  <p>อายุ: {calculateAge(cat.birthDateCat)}</p>
                   <p>
-                    อายุ:{" "}
-                    {totalMonths >= 12
-                      ? `${Math.floor(totalMonths / 12)} ปี ${
-                          totalMonths % 12
-                        } เดือน`
-                      : `${totalMonths} เดือน`}
+                    วันเกิด:{" "}
+                    {new Date(cat.birthDateCat).getDate() +
+                      "-" +
+                      new Date(cat.birthDateCat).getMonth() +
+                      "-" +
+                      new Date(cat.birthDateCat).getFullYear()}
                   </p>
-                  <p>วันเกิด: {cat.birthDate}</p>
                 </CardContent>
-                <CardButton variant="delete">ลบ</CardButton>
+
                 <CardButton
                   variant="edit"
                   onClick={() => {
@@ -239,6 +197,12 @@ function DataCats() {
                   }}
                 >
                   แก้ไข
+                </CardButton>
+                <CardButton
+                  variant="delete"
+                  onClick={() => handelDelete(cat.id)}
+                >
+                  ลบ
                 </CardButton>
               </Card>
             );
@@ -251,9 +215,9 @@ function DataCats() {
       <AddCatModal
         open={isAddCatModalOpen}
         handleClose={closeAddCatModal}
-        handleSubmit={handleAddCat}
         service={typeModal}
         catData={selectedCat}
+        name={name}
       />
 
       {/* <EditCatModal

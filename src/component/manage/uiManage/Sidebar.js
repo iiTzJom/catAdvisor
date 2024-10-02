@@ -96,18 +96,26 @@ const LogoutButton = styled.div`
     background-color: #cc0000;
   }
 `;
+const DivProfile = styled.img`
+  width: 50px; /* ความกว้างของรูปภาพ */
+  height: 50px; /* ความสูงของรูปภาพ */
+  cursor: pointer;
+  margin-right: 10px; /* เพิ่มระยะห่างระหว่างโลโก้และข้อความ */
+  border-radius: 100%;
+`;
 
 function Sidebars() {
   const dispatch = useDispatch();
   const [name, setName] = useState(null);
-
+  const [imgProfile, setImgProfile] = useState(null);
   sessionService
     .loadUser()
     .then((data) => {
       setName(data.firstName + " " + data.lastName);
+      setImgProfile(data.imgProfile);
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
 
   const menu = [
@@ -165,7 +173,12 @@ function Sidebars() {
           ))}
         </DivMenu>
         <BottomSection>
-          <ProfileIcon />
+          {imgProfile !== "" ? (
+            <DivProfile src={imgProfile} />
+          ) : (
+            <ProfileIcon />
+          )}
+
           <ProfileTag>{name}</ProfileTag>
           <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </BottomSection>

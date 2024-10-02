@@ -110,7 +110,7 @@ function AdminSidebars() {
       setName(data.firstName + " " + data.lastName);
     })
     .catch((err) => {
-      window.location.href = "/";
+      //window.location.href = "/";
     });
 
   const menu = [

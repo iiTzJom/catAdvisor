@@ -8,6 +8,13 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import { createCatData } from "../../../api/userCatData";
+import { v4 } from "uuid";
+import { imgDB } from "../../../fireBase/UploadImg";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const style = {
   position: "absolute",
@@ -89,14 +96,17 @@ const HiddenInput = styled.input`
   display: none;
 `;
 
-const AddCatModal = ({
-  open,
-  handleClose,
-  handleSubmit,
-  catData,
-  service,
-  cat = {}, // Default to an empty object if cat is not provided
-}) => {
+const DivIconLoading = styled.div`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+`;
+const AddCatModal = ({ open, handleClose, catData, service, name }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [checkDataEmpty, setCheckDataEmpty] = useState(false);
+  const [imgFile, setImgfile] = useState("");
   const [dataCat, setDataCat] = useState({
     avatar: "https://via.placeholder.com/100",
     birthDate: "",
@@ -104,19 +114,19 @@ const AddCatModal = ({
     gender: "",
     id: "",
     name: "",
-    statusColor: "",
   });
+
+  console.log("5555555555555", catData);
 
   useEffect(() => {
     if (catData != null) {
       setDataCat({
-        avatar: catData.avatar,
-        birthDate: catData.birthDate,
-        breed: catData.breed,
-        gender: catData.gender,
+        avatar: catData.imgCat,
+        birthDate: catData.birthDateCat,
+        breed: catData.breedCat,
+        gender: catData.genderCat,
         id: catData.id,
-        name: catData.name,
-        statusColor: catData.statusColor,
+        name: catData.nameCat,
       });
     } else {
       setDataCat({
@@ -126,25 +136,69 @@ const AddCatModal = ({
         gender: "",
         id: "",
         name: "",
-        statusColor: "",
       });
     }
   }, [catData]);
 
   const handleImageChange = (event) => {
+    setCheckDataEmpty(false);
+    setImgfile(event.target.files[0]);
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setDataCat({ ...dataCat, avatar: reader.result }); // Update image state with the base64 URL
       };
+
       reader.readAsDataURL(file);
     }
   };
 
-  const onSubmit = () => {
-    handleSubmit(dataCat);
-    handleClose();
+  const onSubmit = async () => {
+    if (service === "Edit") {
+    } else {
+      console.log("ssssssssssssss", dataCat);
+      setIsLoading(true);
+
+      var dataSave = {
+        imgCat: "",
+        genderCat: dataCat.gender,
+        birthDateCat: dataCat.birthDate,
+        nameCat: dataCat.name,
+        breedCat: dataCat.breed,
+        createBy: name,
+      };
+
+      if (
+        dataSave.genderCat === "" ||
+        dataSave.birthDateCat === "" ||
+        dataSave.nameCat === "" ||
+        dataSave.breedCat === "" ||
+        imgFile === ""
+      ) {
+        setCheckDataEmpty(true);
+      } else {
+        const id = v4();
+        const imgRef = ref(imgDB, `imgUserCat/${id}`);
+        await uploadBytes(imgRef, imgFile).then((value) =>
+          getDownloadURL(value.ref).then((url) => {
+            dataSave.imgCat = url;
+          })
+        );
+        await createCatData(dataSave)
+          .then((data) => {
+            if (
+              data.data.code === 200 &&
+              data.data.message === "create success"
+            ) {
+              window.location.href = "/Manage?catData";
+            }
+          })
+          .catch((err) => err);
+      }
+      setIsLoading(false);
+    }
+    // handleClose();
   };
 
   return (
@@ -155,6 +209,7 @@ const AddCatModal = ({
       aria-describedby="add-cat-modal-description"
     >
       <Box sx={style}>
+        <DivIconLoading>{isLoading && <CircularProgress />}</DivIconLoading>
         <ModalHeader>
           {service === "Edit" ? "แก้ไขข้อมูลแมว" : "เพิ่มข้อมูลแมว"}
         </ModalHeader>
@@ -178,7 +233,10 @@ const AddCatModal = ({
           type="text"
           variant="outlined"
           value={dataCat.name}
-          onChange={(e) => setDataCat({ ...dataCat, name: e.target.value })}
+          onChange={(e) => {
+            setDataCat({ ...dataCat, name: e.target.value });
+            setCheckDataEmpty(false);
+          }}
         />
         <StyledTextField
           margin="dense"
@@ -186,13 +244,19 @@ const AddCatModal = ({
           type="text"
           variant="outlined"
           value={dataCat.breed}
-          onChange={(e) => setDataCat({ ...dataCat, breed: e.target.value })}
+          onChange={(e) => {
+            setDataCat({ ...dataCat, breed: e.target.value });
+            setCheckDataEmpty(false);
+          }}
         />
         <StyledFormControl variant="outlined">
           <InputLabel>เพศ</InputLabel>
           <Select
             value={dataCat.gender}
-            onChange={(e) => setDataCat({ ...dataCat, gender: e.target.value })}
+            onChange={(e) => {
+              setDataCat({ ...dataCat, gender: e.target.value });
+              setCheckDataEmpty(false);
+            }}
             label="เพศ"
           >
             <MenuItem value="ผู้">ผู้</MenuItem>
@@ -206,13 +270,22 @@ const AddCatModal = ({
           InputLabelProps={{ shrink: true }}
           variant="outlined"
           value={dataCat.birthDate}
-          onChange={(e) =>
-            setDataCat({ ...dataCat, birthDate: e.target.value })
-          }
+          onChange={(e) => {
+            setDataCat({ ...dataCat, birthDate: e.target.value });
+            setCheckDataEmpty(false);
+          }}
         />
         <SubmitButton onClick={onSubmit}>
           {service === "Edit" ? "บันทึกการเปลี่ยนแปลง" : "บันทึกข้อมูล"}
         </SubmitButton>
+
+        {checkDataEmpty && (
+          <Stack sx={{ width: "100%", marginTop: "20px" }} spacing={2}>
+            <Alert severity="error">
+              กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+            </Alert>
+          </Stack>
+        )}
       </Box>
     </Modal>
   );

@@ -14,9 +14,6 @@ import Typography from "@mui/material/Typography";
 import { login } from "../../api/auth";
 import { loginUser } from "../../redux/action/userActions";
 import { useDispatch, useSelector } from "react-redux";
-import { imgDB } from "../../fireBase/UploadImg";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { v4 } from "uuid";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 

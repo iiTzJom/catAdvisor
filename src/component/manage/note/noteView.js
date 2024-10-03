@@ -34,9 +34,7 @@ const Line = styled.div`
   border-top: dashed 1px #6e6e6e;
   margin-top: 20px;
 `;
-const NoteViews = ({ open, onClose, note }) => {
-  if (!note) return null;
-
+const NoteViews = ({ open, onClose, note, dataCat }) => {
   return (
     <Modal
       open={open}
@@ -46,17 +44,23 @@ const NoteViews = ({ open, onClose, note }) => {
     >
       <ModalContent>
         <InfoText>
-          <strong>Tag Id:</strong> {note.tagId}
+          <strong>Tag Id:</strong> {note?.id}
         </InfoText>
         <Line />
-        <Title id="modal-title">{note.title}</Title>
+        <Title id="modal-title">{note?.nameNote}</Title>
         <InfoText>
-          <strong>ชื่อแมว:</strong> {note.name}
+          <strong>ชื่อแมว:</strong>{" "}
+          {dataCat?.filter((v) => v.id === note?.idCat)[0]?.nameCat}
         </InfoText>
         <InfoText>
-          <strong>วันที่บันทึก:</strong> {note.date}
+          <strong>วันที่บันทึก:</strong>{" "}
+          {new Date(note?.noteDate).getDate() +
+            "-" +
+            (new Date(note?.noteDate).getMonth() + 1) +
+            "-" +
+            new Date(note?.noteDate).getFullYear()}
         </InfoText>
-        <NoteText>{note.notes}</NoteText>
+        <NoteText>{note?.text}</NoteText>
       </ModalContent>
     </Modal>
   );

@@ -8,7 +8,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import { createCatData } from "../../../api/userCatData";
+import { createCatData, updateCatByUser } from "../../../api/userCatData";
 import { v4 } from "uuid";
 import { imgDB } from "../../../fireBase/UploadImg";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -116,8 +116,6 @@ const AddCatModal = ({ open, handleClose, catData, service, name }) => {
     name: "",
   });
 
-  console.log("5555555555555", catData);
-
   useEffect(() => {
     if (catData != null) {
       setDataCat({
@@ -156,10 +154,48 @@ const AddCatModal = ({ open, handleClose, catData, service, name }) => {
 
   const onSubmit = async () => {
     if (service === "Edit") {
-    } else {
-      console.log("ssssssssssssss", dataCat);
       setIsLoading(true);
-
+      var dataSave = {
+        imgCat: dataCat.avatar,
+        updateBy: name,
+        genderCat: dataCat.gender,
+        birthDateCat: dataCat.birthDate,
+        nameCat: dataCat.name,
+        breedCat: dataCat.breed,
+        id: dataCat.id,
+      };
+      if (
+        dataSave.genderCat === "" ||
+        dataSave.birthDateCat === "" ||
+        dataSave.nameCat === "" ||
+        dataSave.breedCat === "" ||
+        dataSave.imgCat === ""
+      ) {
+        setCheckDataEmpty(true);
+      } else {
+        const id = v4();
+        const imgRef = ref(imgDB, `imgUserCat/${id}`);
+        if (imgFile !== "") {
+          await uploadBytes(imgRef, imgFile).then((value) =>
+            getDownloadURL(value.ref).then((url) => {
+              dataSave.imgCat = url;
+            })
+          );
+        }
+        await updateCatByUser(dataSave)
+          .then((data) => {
+            if (
+              data.data.code === 200 &&
+              data.data.message === "Update Success"
+            ) {
+              window.location.href = "/Manage?catData";
+            }
+          })
+          .catch((err) => err);
+      }
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
       var dataSave = {
         imgCat: "",
         genderCat: dataCat.gender,

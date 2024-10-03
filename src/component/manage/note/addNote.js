@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import styled from "@emotion/styled";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import { createCatNote, updateCatNoteByUser } from "../../../api/userCatNote";
 
 const ModalContent = styled(Box)`
   background: white;
@@ -28,21 +32,84 @@ const StyledButton = styled(Button)`
   font-weight: bold;
   border-radius: 10px;
 `;
-
-const AddNotes = ({ open, onClose, note }) => {
-  const [formData, setFormData] = useState(note || {});
-
+const DivIconLoading = styled.div`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+`;
+const AddNotes = ({ open, onClose, note, name, item, status }) => {
+  const [formData, setFormData] = useState({
+    idCat: "",
+    nameNote: "",
+    noteDate: "",
+    text: "",
+    createBy: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [checkDataEmpty, setCheckDataEmpty] = useState(false);
   useEffect(() => {
-    setFormData(note || {});
+    setFormData({
+      idCat: note?.idCat,
+      nameNote: note?.nameNote,
+      noteDate: note?.noteDate,
+      text: note?.text,
+      createBy: note?.createBy,
+      id: note?.id,
+    });
   }, [note]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const handleSave = async () => {
+    setIsLoading(true);
+    var dataSave = {
+      idCat: formData.idCat,
+      nameNote: formData.nameNote,
+      noteDate: formData.noteDate,
+      text: formData.text,
+      createBy: name,
+      updateBy: name,
+      id: formData?.id,
+    };
 
-  const handleSave = () => {
-    onClose();
+    if (
+      dataSave.idCat === "" ||
+      !dataSave.idCat ||
+      dataSave.nameNote === "" ||
+      !dataSave.nameNote ||
+      dataSave.noteDate === "" ||
+      !dataSave.noteDate ||
+      dataSave.text === "" ||
+      !dataSave.text
+    ) {
+      setCheckDataEmpty(true);
+    } else {
+      if (status === "edit") {
+        // updateCatNoteByUser;
+        await updateCatNoteByUser(dataSave)
+          .then((data) => {
+            if (
+              data.data.code === 200 &&
+              data.data.message === "Update Success"
+            ) {
+              window.location.href = "/Manage?note";
+            }
+          })
+          .catch((err) => err);
+      } else {
+        await createCatNote(dataSave)
+          .then((data) => {
+            if (
+              data.data.code === 200 &&
+              data.data.message === "create success"
+            ) {
+              window.location.href = "/Manage?note";
+            }
+          })
+          .catch((err) => err);
+      }
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -58,25 +125,32 @@ const AddNotes = ({ open, onClose, note }) => {
       }}
     >
       <ModalContent>
+        <DivIconLoading>{isLoading && <CircularProgress />}</DivIconLoading>
         <FormControl fullWidth margin="normal">
           <InputLabel id="cat-name-label">ชื่อแมว</InputLabel>
           <Select
             labelId="cat-name-label"
             name="name"
-            value={formData.name || ""}
-            onChange={handleChange}
+            value={formData?.idCat}
+            defaultValue={note?.idCat}
+            onChange={(e) => {
+              setFormData({ ...formData, idCat: e.target.value });
+              setCheckDataEmpty(false);
+            }}
             label="ชื่อแมว"
           >
-            <MenuItem value="ฟุกุ">ฟุกุ</MenuItem>
-            <MenuItem value="เลโอ">เลโอ</MenuItem>
+            {item}
           </Select>
         </FormControl>
         <TextField
           label="วันที่บันทึก"
           name="date"
           type="date"
-          value={formData.date || ""}
-          onChange={handleChange}
+          value={formData.noteDate}
+          onChange={(e) => {
+            setFormData({ ...formData, noteDate: e.target.value });
+            setCheckDataEmpty(false);
+          }}
           fullWidth
           margin="normal"
           InputLabelProps={{ shrink: true }}
@@ -84,21 +158,34 @@ const AddNotes = ({ open, onClose, note }) => {
         <TextField
           label="ชื่อเรื่อง"
           name="title"
-          value={formData.title || ""}
-          onChange={handleChange}
+          value={formData.nameNote}
+          onChange={(e) => {
+            setFormData({ ...formData, nameNote: e.target.value });
+            setCheckDataEmpty(false);
+          }}
           fullWidth
           margin="normal"
         />
         <TextField
           label="บันทึก"
           name="notes"
-          value={formData.notes || ""}
-          onChange={handleChange}
+          value={formData.text}
+          onChange={(e) => {
+            setFormData({ ...formData, text: e.target.value });
+            setCheckDataEmpty(false);
+          }}
           fullWidth
           margin="normal"
           multiline
           rows={4}
         />
+        {checkDataEmpty && (
+          <Stack sx={{ width: "100%", marginTop: "20px" }} spacing={2}>
+            <Alert severity="error">
+              กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+            </Alert>
+          </Stack>
+        )}
         <StyledButton onClick={handleSave}>บันทึก</StyledButton>
       </ModalContent>
     </Modal>

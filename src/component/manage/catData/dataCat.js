@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import AddCatModal from "./addCat";
-import EditCatModal from "./editCat";
 import { getCatByUser, deleteCatByUser } from "../../../api/userCatData";
 const Container = styled.div`
   background-color: #71a9db;
@@ -101,11 +99,6 @@ const calculateAge = (birthDate) => {
 
   const monthDiff = today.getMonth() - birth.getMonth(); // คำนวณเดือน
 
-  // ตรวจสอบหากยังไม่ถึงวันเกิดในปีนี้ ให้ลดอายุลง 1 ปี
-  // if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-  //   age--;
-  // }
-
   return age + " ปี" + " " + monthDiff + " เดือน";
 };
 
@@ -182,7 +175,7 @@ function DataCats({ name }) {
                     วันเกิด:{" "}
                     {new Date(cat.birthDateCat).getDate() +
                       "-" +
-                      new Date(cat.birthDateCat).getMonth() +
+                      (new Date(cat.birthDateCat).getMonth() + 1) +
                       "-" +
                       new Date(cat.birthDateCat).getFullYear()}
                   </p>

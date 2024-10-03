@@ -13,3 +13,7 @@ export const deleteCatByUser = async (userName, id) => {
     `http://localhost:3001/deleteCatByUser?userName=${userName}&id=${id}`
   );
 };
+
+export const updateCatByUser = async (data) => {
+  return axios.put(`http://localhost:3001/updateCatByUser?`, data);
+};

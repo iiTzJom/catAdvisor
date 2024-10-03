@@ -51,8 +51,10 @@ function Manage() {
               <UsersProfile name={name} />
             )}
             {window.location.search === "?catData" && <DataCats name={name} />}
-            {window.location.search === "?notiVacine" && <CatVacine />}
-            {window.location.search === "?note" && <CatNote />}
+            {window.location.search === "?notiVacine" && (
+              <CatVacine name={name} />
+            )}
+            {window.location.search === "?note" && <CatNote name={name} />}
           </DivBody>
         </>
       )}

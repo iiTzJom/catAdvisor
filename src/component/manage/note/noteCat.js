@@ -14,6 +14,11 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { getCatByUser } from "../../../api/userCatData";
+import {
+  getCatNoteByUser,
+  deleteCatNoteByUser,
+} from "../../../api/userCatNote";
 import NoteViews from "./noteView";
 import AddNotes from "./addNote";
 
@@ -151,53 +156,73 @@ const ConfirmButton = styled(MuiButton)`
   align-items: center;
 `;
 
-const CatNote = () => {
+const CatNote = ({ name }) => {
   const [keyword, setKeyword] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
   const [openAddNotes, setOpenAddNotes] = useState(false);
   const [openNoteViews, setOpenNoteViews] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const dataBlog = [
-    {
-      name: "ฟุโกะ",
-      tagId: "#23456",
-      date: "11/09/2024",
-      title: "ออกไปเที่ยว",
-      notes: "พาออกไปเที่ยวที่ร้านคาเฟ่แมวและได้ไปพักที่สปาแมวใกล้เคียง...",
-    },
-    {
-      name: "มิคุ",
-      tagId: "#78901",
-      date: "12/09/2024",
-      title: "ไปที่สวนสาธารณะ",
-      notes: "พาไปเดินเล่นที่สวนสาธารณะและพบกับแมวตัวอื่นๆ...",
-    },
-  ];
+  const [catsData, setCatsData] = useState([]);
+  const [listNote, setListNote] = useState([]);
+  const [status, setStatus] = useState("create");
 
   useEffect(() => {
-    if (keyword === "") {
-      setFilteredData(dataBlog);
-    } else {
-      const lowercasedKeyword = keyword.toLowerCase();
-      const filtered = dataBlog.filter((item) =>
-        item.name.toLowerCase().includes(lowercasedKeyword)
-      );
-      setFilteredData(filtered);
-    }
-  }, [keyword, dataBlog]);
+    var newData = [];
+    const getData = getCatByUser(name)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push({
+              id: data?.data?.data[key].id,
+              nameCat: data?.data?.data[key].nameCat,
+            }),
+          ]);
+          setCatsData(newData);
+          // setDataDB(newData);
+        }
+      })
+      .catch((err) => err);
+
+    return () => {
+      clearInterval(getData); // ใช้ clearInterval แทน destroy
+    };
+  }, []);
+
+  useEffect(() => {
+    var newData = [];
+    const getData = getCatNoteByUser(name)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
+          ]);
+          setListNote(newData);
+          // setDataDB(newData);
+        }
+      })
+      .catch((err) => err);
+    return () => {
+      clearInterval(getData); // ใช้ clearInterval แทน destroy
+    };
+  }, []);
 
   const handleOpenAddNotes = () => {
     setSelectedNote(null);
     setOpenAddNotes(true);
     setOpenNoteViews(false);
+    setStatus("create");
   };
 
-  const handleOpenNoteViews = (note) => {
+  const handleOpenNoteViews = (note, type) => {
     setSelectedNote(note);
-    setOpenNoteViews(true);
-    setOpenAddNotes(false);
+    if (type === "view") {
+      setOpenNoteViews(true);
+      setOpenAddNotes(false);
+    } else {
+      setOpenAddNotes(true);
+      handleDropdownClose();
+      setStatus("edit");
+    }
   };
 
   const handleCloseModal = () => {
@@ -215,20 +240,20 @@ const CatNote = () => {
     setAnchorEl(null);
   };
 
-  const handleEditNote = (note) => {
-    setSelectedNote(note);
-    setOpenAddNotes(true);
-    handleDropdownClose();
-  };
-
   const handleDeleteNote = (tagId) => {
-    handleDropdownClose();
+    deleteCatNoteByUser(name, tagId)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          window.location.href = "/Manage?note";
+        }
+      })
+      .catch((err) => err);
   };
 
   return (
     <PageWrapper>
       <DivSearch>
-        <FormControl
+        {/* <FormControl
           sx={{
             m: 1,
             "& fieldset": { border: "none" },
@@ -256,7 +281,7 @@ const CatNote = () => {
               if (e.key === "Enter") setKeyword(e.target.value);
             }}
           />
-        </FormControl>
+        </FormControl> */}
       </DivSearch>
 
       <TableContainerMain>
@@ -269,48 +294,45 @@ const CatNote = () => {
         <TableContainer>
           <Table>
             <TableHeader>
-              <TableHeaderItem>Tag Id</TableHeaderItem>
               <TableHeaderItem>ชื่อแมว</TableHeaderItem>
               <TableHeaderItem>วันที่บันทึก</TableHeaderItem>
               <TableHeaderItem>ชื่อเรื่อง</TableHeaderItem>
               <TableHeaderItem>บันทึก</TableHeaderItem>
               <TableHeaderItem align="center">ดูบันทึก</TableHeaderItem>
-              <TableHeaderItem align="center">แก้ไข</TableHeaderItem>
+              <TableHeaderItem align="center"></TableHeaderItem>
             </TableHeader>
-            {filteredData.map((record, index) => (
+            {listNote.map((record, index) => (
               <TableRow key={index}>
-                <TableData>{record.tagId}</TableData>
-                <TableData>{record.name}</TableData>
-                <TableData>{record.date}</TableData>
-                <TableData>{record.title}</TableData>
-                <TableData>{record.notes}</TableData>
+                <TableData>
+                  {catsData.filter((v) => v.id === record.idCat)[0].nameCat}
+                </TableData>
+                <TableData>
+                  {new Date(record?.noteDate).getDate() +
+                    "-" +
+                    (new Date(record?.noteDate).getMonth() + 1) +
+                    "-" +
+                    new Date(record?.noteDate).getFullYear()}
+                </TableData>
+                <TableData>{record.nameNote}</TableData>
+                <TableData>{record.text}</TableData>
                 <TableData align="center">
-                  <ConfirmButton onClick={() => handleOpenNoteViews(record)}>
+                  <ConfirmButton
+                    onClick={() => handleOpenNoteViews(record, "view")}
+                  >
                     <VisibilityIcon
                       style={{ color: "white", fontSize: "24px" }}
                     />
                   </ConfirmButton>
                 </TableData>
                 <TableData align="center">
-                  <IconButton onClick={handleDropdownClick}>
-                    <MoreHorizIcon
-                      style={{ color: "black", fontSize: "24px" }}
-                    />
-                  </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleDropdownClose}
-                  >
-                    <MenuItem onClick={() => handleEditNote(record)}>
-                      <EditIcon style={{ marginRight: "8px" }} />
-                      แก้ไข
-                    </MenuItem>
-                    <MenuItem onClick={() => handleDeleteNote(record.tagId)}>
-                      <DeleteIcon style={{ marginRight: "8px" }} />
-                      ลบ
-                    </MenuItem>
-                  </Menu>
+                  <MenuItem onClick={() => handleOpenNoteViews(record, "edit")}>
+                    <EditIcon style={{ marginRight: "8px" }} />
+                    แก้ไข
+                  </MenuItem>
+                  <MenuItem onClick={() => handleDeleteNote(record.id)}>
+                    <DeleteIcon style={{ marginRight: "8px" }} />
+                    ลบ
+                  </MenuItem>
                 </TableData>
               </TableRow>
             ))}
@@ -322,11 +344,18 @@ const CatNote = () => {
         open={openAddNotes}
         onClose={handleCloseModal}
         note={selectedNote}
+        name={name}
+        dataCat={catsData}
+        status={status}
+        item={catsData?.map((data) => (
+          <MenuItem value={data.id}>{data.nameCat}</MenuItem>
+        ))}
       />
       <NoteViews
         open={openNoteViews}
         onClose={handleCloseModal}
         note={selectedNote}
+        dataCat={catsData}
       />
     </PageWrapper>
   );

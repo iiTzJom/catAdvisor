@@ -65,37 +65,18 @@ function SlideCat({ data }) {
           <>
             <Card
               onClick={() =>
-                (window.location.href = "/cat-breeds-detail/" + value.id)
+                (window.location.href = "/cat-breeds-detail?" + value.id)
               }
-              bg={value.bgColor}
+              bg={value.backgroundColor}
             >
-              <DivImage src={process.env.PUBLIC_URL + value.pic} />
+              <DivImage src={value.imgGeneral} />
             </Card>
             <Name
               onClick={() =>
-                (window.location.href = "/cat-breeds-detail/" + value.id)
+                (window.location.href = "/cat-breeds-detail?" + value.id)
               }
             >
-              {value.nameTh + " " + value.nameEn}
-            </Name>
-          </>
-        ))}
-        {data.map((value) => (
-          <>
-            <Card
-              onClick={() =>
-                (window.location.href = "/cat-breeds-detail/" + value.id)
-              }
-              bg={value.bgColor}
-            >
-              <DivImage src={process.env.PUBLIC_URL + value.pic} />
-            </Card>
-            <Name
-              onClick={() =>
-                (window.location.href = "/cat-breeds-detail/" + value.id)
-              }
-            >
-              {value.nameTh + " " + value.nameEn}
+              {value.nameTH + " " + value.nameEN}
             </Name>
           </>
         ))}

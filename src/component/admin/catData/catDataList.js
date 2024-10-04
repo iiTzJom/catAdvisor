@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled/macro";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
-
+import { getListCatBreeds, deleteCatBreeds } from "../../../api/catBreeds";
 const Container = styled.div`
   display: flex;
   background-color: #71a9db; /* Background of main page */
@@ -20,27 +18,36 @@ const ContentWrapper = styled.div`
   align-items: center;
 `;
 
-const PageHeader = styled.div`
-  background-color: #fbb03b;
-  width: 1000px;
-  padding: 15px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
-  border-radius: 20px;
-  cursor: pointer;
-`;
-
 const CardGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  width: 80%;
-  max-width: 1200px;
-  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  width: 92%;
+  //max-width: 90%;
+  margin-right: 20px;
   justify-items: center;
+  overflow-y: scroll;
+  overflow-x: clip;
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #ededed;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #d4d2d2;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4;
+  }
 `;
 
 const CatCard = styled.div`
@@ -55,6 +62,8 @@ const CatCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-right: 50px;
+  margin-bottom: 50px;
 `;
 
 const CatImage = styled.img`
@@ -75,41 +84,12 @@ const CatName = styled.h3`
   white-space: pre-line;
 `;
 
-const MenuDropdown = styled.div`
+const DivIconLoading = styled.div`
   position: absolute;
-  top: 30px;
-  right: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  display: ${(props) => (props.show ? "block" : "none")};
-  min-width: 180px;
-  z-index: 10;
-`;
-
-const MenuItem = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #f0f0f0;
-  }
-`;
-
-const MenuIcon = styled.div`
-  margin-right: 8px;
-`;
-
-const IconButton = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #333;
-  cursor: pointer;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  z-index: 100;
 `;
 
 const AddButton = styled(Button)`
@@ -129,55 +109,53 @@ const DivButtonAdd = styled.div`
   text-align: end;
 `;
 
+const CardButton = styled(Button)`
+  margin-top: 10px;
+  width: 100%;
+  background-color: ${(props) =>
+    props.variant === "edit" ? "#ffb74d" : "#ef5350"};
+  color: white;
+  &:hover {
+    background-color: ${(props) =>
+      props.variant === "edit" ? "#ffa726" : "#e53935"};
+  }
+`;
+
 function CatDataList() {
-  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleIconClick = (id) => {
-    setSelectedCardIndex(id);
+  const [dataCatBreeds, setDataCatBreedss] = useState([]);
+
+  useEffect(() => {
+    var newData = [];
+    const getData = getListCatBreeds()
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
+          ]);
+          setDataCatBreedss(newData);
+        }
+      })
+      .catch((err) => err);
+
+    return () => {
+      clearInterval(getData);
+    };
+  }, []);
+
+  const handelDelete = (id) => {
+    deleteCatBreeds(id)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          window.location.href = "/admin?cat-data-list";
+        }
+      })
+      .catch((err) => err);
   };
-
-  // const handleClickOutside = (event) => {
-  //   if (
-  //     !event.target.closest(".cat-card") &&
-  //     !event.target.closest(".page-header")
-  //   ) {
-  //     setSelectedCardIndex(null);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-
-  const catData = [
-    {
-      id: 1,
-      nameTH: "อเมริกัน ช็อตแฮร์",
-      nameEN: "American Short Hair",
-      bgColor: "#a0d8f1",
-      image: "/AmericanStand.png",
-    },
-    {
-      id: 2,
-      nameTH: "บริติช ช็อตแฮร์",
-      nameEN: "British Short Hair",
-      bgColor: "#f0a0a0",
-      image: "/BritishStand.png",
-    },
-    {
-      id: 3,
-      nameTH: "สก็อตติช โฟลด์",
-      nameEN: "Scottish Fold",
-      bgColor: "#fce191",
-      image: "/ScottishStand.png",
-    },
-  ];
-
   return (
     <Container>
+      <DivIconLoading>{isLoading && <CircularProgress />}</DivIconLoading>
       <ContentWrapper>
         <DivButtonAdd>
           <AddButton
@@ -188,34 +166,32 @@ function CatDataList() {
           </AddButton>
         </DivButtonAdd>
         <CardGrid>
-          {catData.map((cat, index) => (
-            <CatCard key={index} bgColor={cat.bgColor} className="cat-card">
-              <CatImage src={cat.image} alt={cat.nameEN} />
+          {dataCatBreeds?.map((cat, index) => (
+            <CatCard
+              key={index}
+              bgColor={cat.backgroundColor}
+              className="cat-card"
+            >
+              <CatImage src={cat.imgGeneral} />
+
               <CatName>
                 {cat.nameTH}
                 <br />
                 {cat.nameEN}
               </CatName>
-              <MenuDropdown
-                onMouseLeave={() => setSelectedCardIndex(0)}
-                show={selectedCardIndex === cat.id}
+
+              <CardButton
+                variant="edit"
+                onClick={() =>
+                  (window.location.href =
+                    "/Admin?add-edit-data-cat&id=" + cat.id)
+                }
               >
-                <MenuItem>
-                  <MenuIcon>
-                    <EditIcon />
-                  </MenuIcon>
-                  แก้ไข
-                </MenuItem>
-                <MenuItem>
-                  <MenuIcon>
-                    <DeleteIcon />
-                  </MenuIcon>
-                  ลบ
-                </MenuItem>
-              </MenuDropdown>
-              <IconButton onClick={() => handleIconClick(cat.id)}>
-                <MoreHorizIcon />
-              </IconButton>
+                แก้ไข
+              </CardButton>
+              <CardButton variant="delete" onClick={() => handelDelete(cat.id)}>
+                ลบ
+              </CardButton>
             </CatCard>
           ))}
         </CardGrid>

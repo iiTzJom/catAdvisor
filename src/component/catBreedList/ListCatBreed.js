@@ -1,4 +1,6 @@
 import styled from "@emotion/styled/macro";
+import React, { useEffect, useState } from "react";
+import { getListCatBreeds } from "../../api/catBreeds";
 
 const CardList = styled.div`
   display: flex;
@@ -9,7 +11,7 @@ const CardList = styled.div`
 `;
 
 const ImageCat = styled.img`
-  height: 100%;
+  height: 450px;
 `;
 
 const DivLeft = styled.div`
@@ -78,23 +80,44 @@ function ListCatBreed() {
       bgColor: "#EED7A1",
     },
   ];
+
+  const [dataCatBreeds, setDataCatBreedss] = useState([]);
+
+  useEffect(() => {
+    var newData = [];
+    const getData = getListCatBreeds()
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
+          ]);
+          setDataCatBreedss(newData);
+        }
+      })
+      .catch((err) => err);
+
+    return () => {
+      clearInterval(getData);
+    };
+  }, []);
+
   return (
     <>
-      {dataCat.map((data) => (
-        <CardList bg={data.bgColor}>
+      {dataCatBreeds.map((data) => (
+        <CardList bg={data?.backgroundColor}>
           <DivLeft>
-            <Title>{data.name}</Title>
-            <Dcs>{data.detail}</Dcs>
+            <Title>{data?.nameTH}</Title>
+            <Dcs>{data?.textGeneral}</Dcs>
             <SeeMore
               onClick={() =>
-                (window.location.href = "/cat-breeds-detail/" + data.id)
+                (window.location.href = "/cat-breeds-detail?" + data?.id)
               }
             >
               ดูเพิ่มเติม
             </SeeMore>
           </DivLeft>
           <DivRight>
-            <ImageCat src={process.env.PUBLIC_URL + data.pic} />
+            <ImageCat src={data?.imgGeneral} />
           </DivRight>
         </CardList>
       ))}

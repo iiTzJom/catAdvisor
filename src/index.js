@@ -71,7 +71,7 @@ root.render(
           <Route path="cat-compare" element={<CompareCat />} />
           <Route path="map" element={<Map />} />
           <Route path="cat-breeds-list" element={<CatBreed />} />
-          <Route path="cat-breeds-detail/:id" element={<CatBreedDetail />} />
+          <Route path="cat-breeds-detail" element={<CatBreedDetail />} />
           <Route path="text-blog-list" element={<TextBlogList />} />
           <Route path="manage" element={<Manage />} />
           <Route path="admin" element={<ManageAdmin />} />

@@ -40,6 +40,7 @@ const DivRight = styled.div`
 `;
 
 const ImageCat = styled.img`
+  max-height: 650px;
   height: 100%;
 `;
 
@@ -48,12 +49,12 @@ function DetailCatBreed({ data }) {
     <Contain>
       <DivDetail>
         <DivLeft>
-          <TitleTh>{data?.nameTh}</TitleTh>
-          <TitleEn>{data?.nameEn}</TitleEn>
-          <Dcs>{ReactHtmlParser(data?.detail)}</Dcs>
+          <TitleTh>{data?.nameTH}</TitleTh>
+          <TitleEn>{data?.nameEN}</TitleEn>
+          <Dcs>{ReactHtmlParser(data?.textGeneral)}</Dcs>
         </DivLeft>
         <DivRight>
-          <ImageCat src={process.env.PUBLIC_URL + data?.pic} />
+          <ImageCat src={data?.imgGeneral} />
         </DivRight>
       </DivDetail>
     </Contain>

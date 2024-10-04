@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled/macro";
 import PanoramaIcon from "@mui/icons-material/Panorama";
-import { TextField, Button, Select, MenuItem } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ReactHtmlParser from "react-html-parser";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import { Padding } from "@mui/icons-material";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import { v4 } from "uuid";
+import { imgDB } from "../../../fireBase/UploadImg";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  createCatBreedData,
+  getCatBreedsDetail,
+  updateCatBreeds,
+} from "../../../api/catBreeds";
 
 const Container = styled.div`
   width: 100%;
@@ -82,6 +92,13 @@ const DivIconUpload = styled.div`
 
 const HiddenInput = styled.input`
   display: none;
+  background-color: red;
+  width: 100%;
+  position: absolute;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
 `;
 
 const TextFieldWrapper = styled.div`
@@ -200,31 +217,46 @@ const style = {
   padding: "20px",
 };
 
-function ManageDataCat() {
+const DivIconLoading = styled.div`
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+`;
+
+function ManageDataCat({ name }) {
   const [isStep, setIsSetp] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState({
+    imgGeneral: "",
+    imgBody: "",
+    imgPersonalTraits: "",
+    imgGeneticDisease: "",
+  });
 
   const [dataCat, setDataCat] = useState({
+    imgGeneral: "",
+    textGeneral: "",
+    nameTH: "",
+    nameEN: "",
     scoreCharacter: 1,
     scorePersistence: 1,
     scoreFurCare: 1,
     scoreFriendliness: 1,
-    descriptionInfo: "",
-    descriptionAppear: "",
-    descriptionTemper: "",
-    descriptionIll: "",
+    imgBody: "",
+    textBody: "",
+    imgPersonalTraits: "",
+    textPersonalTraits: "",
+    textGeneticDisease: "",
+    imgGeneticDisease: "",
+    backgroundColor: "",
   });
 
   const [textReview, setTextReview] = useState("");
   const [isOpenModal, setIsOpenModal] = useState(false);
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(URL.createObjectURL(file));
-    }
-  };
-
+  const [checkDataEmpty, setCheckDataEmpty] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [type, setType] = useState("create");
   const Step = [
     {
       id: 1,
@@ -252,8 +284,169 @@ function ManageDataCat() {
     },
   ];
 
+  useEffect(() => {
+    if (window.location.search.split("&").length === 2) {
+      setType("edit");
+      const getData = getCatBreedsDetail(
+        window.location.search.split("&")[1].slice(3)
+      ).then((data) => {
+        if (data.data.code === 200) {
+          setDataCat(data.data.data);
+        }
+      });
+      return () => {
+        clearInterval(getData); // ใช้ clearInterval แทน destroy
+      };
+    } else {
+      setType("create");
+    }
+  }, []);
+
+  console.log("sssssss", dataCat);
+  const handleSave = async () => {
+    setIsLoading(true);
+    var dataSave = {
+      imgGeneral: dataCat.imgGeneral,
+      textGeneral: dataCat.textGeneral,
+      nameTH: dataCat.nameTH,
+      nameEN: dataCat.nameEN,
+      scoreCharacter: dataCat.scoreCharacter,
+      scorePersistence: dataCat.scorePersistence,
+      scoreFurCare: dataCat.scoreFurCare,
+      scoreFriendliness: dataCat.scoreFriendliness,
+      imgBody: dataCat.imgBody,
+      textBody: dataCat.textBody,
+      imgPersonalTraits: dataCat.imgPersonalTraits,
+      textPersonalTraits: dataCat.textPersonalTraits,
+      textGeneticDisease: dataCat.textGeneticDisease,
+      imgGeneticDisease: dataCat.imgGeneticDisease,
+      backgroundColor: dataCat.backgroundColor,
+      createBy: name,
+    };
+
+    await uploadBytes(
+      ref(imgDB, `imgCatBreeds/${v4()}`),
+      dataSave.imgGeneral
+    ).then((value) =>
+      getDownloadURL(value.ref).then((url) => {
+        dataSave.imgGeneral = url;
+      })
+    );
+
+    await uploadBytes(
+      ref(imgDB, `imgCatBreeds/${v4()}`),
+      dataSave.imgBody
+    ).then((value) =>
+      getDownloadURL(value.ref).then((url) => {
+        dataSave.imgBody = url;
+      })
+    );
+
+    await uploadBytes(
+      ref(imgDB, `imgCatBreeds/${v4()}`),
+      dataSave.imgPersonalTraits
+    ).then((value) =>
+      getDownloadURL(value.ref).then((url) => {
+        dataSave.imgPersonalTraits = url;
+      })
+    );
+
+    await uploadBytes(
+      ref(imgDB, `imgCatBreeds/${v4()}`),
+      dataSave.imgGeneticDisease
+    ).then((value) =>
+      getDownloadURL(value.ref).then((url) => {
+        dataSave.imgGeneticDisease = url;
+      })
+    );
+    createCatBreedData(dataSave)
+      .then((data) => {
+        if (data.data.code === 200 && data.data.message === "create success") {
+          window.location.href = "/admin?cat-data-list";
+        }
+      })
+      .catch((err) => err);
+
+    setIsLoading(false);
+  };
+
+  const handleEdit = async () => {
+    setIsLoading(true);
+    var dataSave = {
+      id: dataCat.id,
+      imgGeneral: dataCat.imgGeneral,
+      textGeneral: dataCat.textGeneral,
+      nameTH: dataCat.nameTH,
+      nameEN: dataCat.nameEN,
+      scoreCharacter: dataCat.scoreCharacter,
+      scorePersistence: dataCat.scorePersistence,
+      scoreFurCare: dataCat.scoreFurCare,
+      scoreFriendliness: dataCat.scoreFriendliness,
+      imgBody: dataCat.imgBody,
+      textBody: dataCat.textBody,
+      imgPersonalTraits: dataCat.imgPersonalTraits,
+      textPersonalTraits: dataCat.textPersonalTraits,
+      textGeneticDisease: dataCat.textGeneticDisease,
+      imgGeneticDisease: dataCat.imgGeneticDisease,
+      backgroundColor: dataCat.backgroundColor,
+      updateBy: name,
+    };
+
+    if (selectedImage.imgGeneral !== "") {
+      await uploadBytes(
+        ref(imgDB, `imgCatBreeds/${v4()}`),
+        dataSave.imgGeneral
+      ).then((value) =>
+        getDownloadURL(value.ref).then((url) => {
+          dataSave.imgGeneral = url;
+        })
+      );
+    }
+
+    if (selectedImage.imgBody !== "") {
+      await uploadBytes(
+        ref(imgDB, `imgCatBreeds/${v4()}`),
+        dataSave.imgBody
+      ).then((value) =>
+        getDownloadURL(value.ref).then((url) => {
+          dataSave.imgBody = url;
+        })
+      );
+    }
+
+    if (selectedImage.imgPersonalTraits) {
+      await uploadBytes(
+        ref(imgDB, `imgCatBreeds/${v4()}`),
+        dataSave.imgPersonalTraits
+      ).then((value) =>
+        getDownloadURL(value.ref).then((url) => {
+          dataSave.imgPersonalTraits = url;
+        })
+      );
+    }
+    if (selectedImage.imgGeneticDisease) {
+      await uploadBytes(
+        ref(imgDB, `imgCatBreeds/${v4()}`),
+        dataSave.imgGeneticDisease
+      ).then((value) =>
+        getDownloadURL(value.ref).then((url) => {
+          dataSave.imgGeneticDisease = url;
+        })
+      );
+    }
+
+    updateCatBreeds(dataSave)
+      .then((data) => {
+        if (data.data.code === 200 && data.data.message === "Update Success") {
+          window.location.href = "/admin?cat-data-list";
+        }
+      })
+      .catch((err) => err);
+  };
+
   return (
     <Container>
+      <DivIconLoading>{isLoading && <CircularProgress />}</DivIconLoading>
       <DivStep>
         {Step.map((data) => (
           <div key={data.id}>
@@ -271,6 +464,13 @@ function ManageDataCat() {
       </DivStep>
       {isStep === 1 && (
         <DivDataEdit>
+          {checkDataEmpty && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity="error">
+                กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+              </Alert>
+            </Stack>
+          )}
           <DivBodyEdit>
             <DivLeft>
               <TextTitle>ข้อมูลทั่วไป</TextTitle>
@@ -278,22 +478,39 @@ function ManageDataCat() {
                 onClick={() => document.getElementById("imageUpload").click()}
               >
                 <DivIconUpload>
-                  <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
-                  <p>อัปโหลดรูปภาพ</p>
                   <HiddenInput
                     id="imageUpload"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={(e) => {
+                      setSelectedImage({
+                        ...selectedImage,
+                        imgGeneral: URL.createObjectURL(e.target.files[0]),
+                      });
+                      setDataCat({
+                        ...dataCat,
+                        imgGeneral: e.target.files[0],
+                      });
+                    }}
                   />
+                  {selectedImage.imgGeneral !== "" ||
+                  dataCat.imgGeneral !== "" ? (
+                    <img
+                      src={
+                        selectedImage.imgGeneral === ""
+                          ? dataCat.imgGeneral
+                          : selectedImage.imgGeneral
+                      }
+                      alt="Selected"
+                      style={{ maxHeight: "320px" }}
+                    />
+                  ) : (
+                    <>
+                      <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+                      <p>อัปโหลดรูปภาพ</p>
+                    </>
+                  )}
                 </DivIconUpload>
-                {selectedImage && (
-                  <img
-                    src={selectedImage}
-                    alt="Selected"
-                    style={{ width: "80px", marginTop: "10px" }}
-                  />
-                )}
               </UploadBox>
               <TextFieldWrapper>
                 <TextField
@@ -301,13 +518,52 @@ function ManageDataCat() {
                   variant="outlined"
                   fullWidth
                   margin="normal"
+                  value={dataCat.nameTH}
+                  onChange={(e) => {
+                    setDataCat({ ...dataCat, nameTH: e.target.value });
+                    setCheckDataEmpty(false);
+                  }}
                 />
                 <TextField
                   label="ชื่อภาษาอังกฤษ"
                   variant="outlined"
                   fullWidth
                   margin="normal"
+                  value={dataCat.nameEN}
+                  onChange={(e) => {
+                    setDataCat({ ...dataCat, nameEN: e.target.value });
+                    setCheckDataEmpty(false);
+                  }}
                 />
+                <div style={{ display: "flex" }}>
+                  <TextField
+                    label="สีพื้นหลัง"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    sx={{
+                      width: "50%",
+                    }}
+                    value={dataCat.backgroundColor}
+                    onChange={(e) => {
+                      setDataCat({
+                        ...dataCat,
+                        backgroundColor: e.target.value,
+                      });
+                      setCheckDataEmpty(false);
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: "48%",
+                      height: "56px",
+                      marginLeft: "2%",
+                      marginTop: "15px",
+                      border: "1px solid LightGray",
+                      backgroundColor: dataCat.backgroundColor,
+                    }}
+                  />
+                </div>
               </TextFieldWrapper>
             </DivLeft>
             <DivRight>
@@ -319,16 +575,17 @@ function ManageDataCat() {
                   margin="normal"
                   multiline
                   rows={12}
-                  defaultValue={dataCat.descriptionInfo}
-                  onChange={(e) =>
-                    setDataCat({ ...dataCat, descriptionInfo: e.target.value })
-                  }
+                  value={dataCat.textGeneral}
+                  onChange={(e) => {
+                    setDataCat({ ...dataCat, textGeneral: e.target.value });
+                    setCheckDataEmpty(false);
+                  }}
                 />
                 <DivReviewBt>
                   <ReviewBt
                     onClick={() => {
                       setIsOpenModal(true);
-                      setTextReview(dataCat.descriptionInfo);
+                      setTextReview(dataCat.textGeneral);
                     }}
                   >
                     ดูตัวอย่าง
@@ -445,11 +702,25 @@ function ManageDataCat() {
               </Note>
             </DivRight>
           </DivBodyEdit>
+
           <DivButtonNext>
             <ButtonNextPrev
               bg={"#FFBF6B"}
               bgHover={"#f3b565"}
-              onClick={() => setIsSetp(2)}
+              onClick={() => {
+                if (
+                  dataCat.imgGeneral === "" ||
+                  dataCat.nameEN === "" ||
+                  dataCat.nameTH === "" ||
+                  dataCat.textGeneral === "" ||
+                  dataCat.backgroundColor === ""
+                ) {
+                  setCheckDataEmpty(true);
+                } else {
+                  setIsSetp(2);
+                  setCheckDataEmpty(false);
+                }
+              }}
             >
               ถัดไป
             </ButtonNextPrev>
@@ -459,27 +730,52 @@ function ManageDataCat() {
 
       {isStep === 2 && (
         <DivDataEdit>
+          {checkDataEmpty && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity="error">
+                กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+              </Alert>
+            </Stack>
+          )}
           <DivBodyEdit>
             <DivLeft>
               <TextTitle>ลักษณะร่างกาย</TextTitle>
               <UploadBox
-                onClick={() => document.getElementById("imageUpload").click()}
+                onClick={() => document.getElementById("imgBody").click()}
               >
                 <DivIconUpload>
-                  <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
-                  <p>อัปโหลดรูปภาพ</p>
                   <HiddenInput
-                    id="imageUpload"
+                    id="imgBody"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={(e) => {
+                      setSelectedImage({
+                        ...selectedImage,
+                        imgBody: URL.createObjectURL(e.target.files[0]),
+                      });
+                      setDataCat({
+                        ...dataCat,
+                        imgBody: e.target.files[0],
+                      });
+                      setCheckDataEmpty(false);
+                    }}
                   />
-                  {selectedImage && (
+
+                  {selectedImage.imgBody !== "" || dataCat.imgBody !== "" ? (
                     <img
-                      src={selectedImage}
+                      src={
+                        selectedImage.imgBody === ""
+                          ? dataCat.imgBody
+                          : selectedImage.imgBody
+                      }
                       alt="Selected"
-                      style={{ width: "80px", marginTop: "10px" }}
+                      style={{ maxHeight: "320px" }}
                     />
+                  ) : (
+                    <>
+                      <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+                      <p>อัปโหลดรูปภาพ</p>
+                    </>
                   )}
                 </DivIconUpload>
               </UploadBox>
@@ -493,19 +789,20 @@ function ManageDataCat() {
                   margin="normal"
                   multiline
                   rows={12}
-                  defaultValue={dataCat.descriptionAppear}
-                  onChange={(e) =>
+                  value={dataCat.textBody}
+                  onChange={(e) => {
                     setDataCat({
                       ...dataCat,
-                      descriptionAppear: e.target.value,
-                    })
-                  }
+                      textBody: e.target.value,
+                    });
+                    setCheckDataEmpty(false);
+                  }}
                 />
                 <DivReviewBt>
                   <ReviewBt
                     onClick={() => {
                       setIsOpenModal(true);
-                      setTextReview(dataCat.descriptionAppear);
+                      setTextReview(dataCat.textBody);
                     }}
                   >
                     ดูตัวอย่าง
@@ -526,7 +823,14 @@ function ManageDataCat() {
             <ButtonNextPrev
               bg={"#FFBF6B"}
               bgHover={"#f3b565"}
-              onClick={() => setIsSetp(3)}
+              onClick={() => {
+                if (dataCat.imgBody === "" || dataCat.textBody === "") {
+                  setCheckDataEmpty(true);
+                } else {
+                  setIsSetp(3);
+                  setCheckDataEmpty(false);
+                }
+              }}
             >
               ถัดไป
             </ButtonNextPrev>
@@ -536,27 +840,58 @@ function ManageDataCat() {
 
       {isStep === 3 && (
         <DivDataEdit>
+          {checkDataEmpty && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity="error">
+                กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+              </Alert>
+            </Stack>
+          )}
           <DivBodyEdit>
             <DivLeft>
               <TextTitle>ลักษณะนิสัย</TextTitle>
+
               <UploadBox
-                onClick={() => document.getElementById("imageUpload").click()}
+                onClick={() =>
+                  document.getElementById("imgPersonalTraits").click()
+                }
               >
                 <DivIconUpload>
-                  <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
-                  <p>อัปโหลดรูปภาพ</p>
                   <HiddenInput
-                    id="imageUpload"
+                    id="imgPersonalTraits"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={(e) => {
+                      setSelectedImage({
+                        ...selectedImage,
+                        imgPersonalTraits: URL.createObjectURL(
+                          e.target.files[0]
+                        ),
+                      });
+                      setDataCat({
+                        ...dataCat,
+                        imgPersonalTraits: e.target.files[0],
+                      });
+                      setCheckDataEmpty(false);
+                    }}
                   />
-                  {selectedImage && (
+
+                  {selectedImage.imgPersonalTraits !== "" ||
+                  dataCat.imgPersonalTraits !== "" ? (
                     <img
-                      src={selectedImage}
+                      src={
+                        selectedImage.imgPersonalTraits === ""
+                          ? dataCat.imgPersonalTraits
+                          : selectedImage.imgPersonalTraits
+                      }
                       alt="Selected"
-                      style={{ width: "80px", marginTop: "10px" }}
+                      style={{ maxHeight: "320px" }}
                     />
+                  ) : (
+                    <>
+                      <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+                      <p>อัปโหลดรูปภาพ</p>
+                    </>
                   )}
                 </DivIconUpload>
               </UploadBox>
@@ -570,19 +905,20 @@ function ManageDataCat() {
                   margin="normal"
                   multiline
                   rows={12}
-                  defaultValue={dataCat.descriptionTemper}
-                  onChange={(e) =>
+                  value={dataCat.textPersonalTraits}
+                  onChange={(e) => {
                     setDataCat({
                       ...dataCat,
-                      descriptionTemper: e.target.value,
-                    })
-                  }
+                      textPersonalTraits: e.target.value,
+                    });
+                    setCheckDataEmpty(false);
+                  }}
                 />
                 <DivReviewBt>
                   <ReviewBt
                     onClick={() => {
                       setIsOpenModal(true);
-                      setTextReview(dataCat.descriptionTemper);
+                      setTextReview(dataCat.textPersonalTraits);
                     }}
                   >
                     ดูตัวอย่าง
@@ -603,7 +939,17 @@ function ManageDataCat() {
             <ButtonNextPrev
               bg={"#FFBF6B"}
               bgHover={"#f3b565"}
-              onClick={() => setIsSetp(4)}
+              onClick={() => {
+                if (
+                  dataCat.imgPersonalTraits === "" ||
+                  dataCat.textPersonalTraits === ""
+                ) {
+                  setCheckDataEmpty(true);
+                } else {
+                  setIsSetp(4);
+                  setCheckDataEmpty(false);
+                }
+              }}
             >
               ถัดไป
             </ButtonNextPrev>
@@ -613,29 +959,60 @@ function ManageDataCat() {
 
       {isStep === 4 && (
         <DivDataEdit>
+          {checkDataEmpty && (
+            <Stack sx={{ width: "100%" }} spacing={2}>
+              <Alert severity="error">
+                กรอกข้อมูลไม่ครบ กรุณาตรวจสอบอีกครั้ง
+              </Alert>
+            </Stack>
+          )}
           <DivBodyEdit>
             <DivLeft>
               <TextTitle>โรคทางพันธุกรรม</TextTitle>
+
               <UploadBox
-                onClick={() => document.getElementById("imageUpload").click()}
+                onClick={() =>
+                  document.getElementById("imgGeneticDisease").click()
+                }
               >
                 <DivIconUpload>
-                  <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
-                  <p>อัปโหลดรูปภาพ</p>
                   <HiddenInput
-                    id="imageUpload"
+                    id="imgGeneticDisease"
                     type="file"
                     accept="image/*"
-                    onChange={handleImageUpload}
+                    onChange={(e) => {
+                      setSelectedImage({
+                        ...selectedImage,
+                        imgGeneticDisease: URL.createObjectURL(
+                          e.target.files[0]
+                        ),
+                      });
+                      setDataCat({
+                        ...dataCat,
+                        imgGeneticDisease: e.target.files[0],
+                      });
+                      setCheckDataEmpty(false);
+                    }}
                   />
+
+                  {selectedImage.imgGeneticDisease !== "" ||
+                  dataCat.imgGeneticDisease !== "" ? (
+                    <img
+                      src={
+                        selectedImage.imgGeneticDisease === ""
+                          ? dataCat.imgGeneticDisease
+                          : selectedImage.imgGeneticDisease
+                      }
+                      alt="Selected"
+                      style={{ maxHeight: "320px" }}
+                    />
+                  ) : (
+                    <>
+                      <PanoramaIcon style={{ fontSize: 50, color: "#888" }} />
+                      <p>อัปโหลดรูปภาพ</p>
+                    </>
+                  )}
                 </DivIconUpload>
-                {selectedImage && (
-                  <img
-                    src={selectedImage}
-                    alt="Selected"
-                    style={{ width: "80px", marginTop: "10px" }}
-                  />
-                )}
               </UploadBox>
             </DivLeft>
             <DivRight>
@@ -647,19 +1024,20 @@ function ManageDataCat() {
                   margin="normal"
                   multiline
                   rows={12}
-                  defaultValue={dataCat.descriptionIll}
-                  onChange={(e) =>
+                  defaultValue={dataCat.textGeneticDisease}
+                  onChange={(e) => {
                     setDataCat({
                       ...dataCat,
-                      descriptionIll: e.target.value,
-                    })
-                  }
+                      textGeneticDisease: e.target.value,
+                    });
+                    setCheckDataEmpty(false);
+                  }}
                 />
                 <DivReviewBt>
                   <ReviewBt
                     onClick={() => {
                       setIsOpenModal(true);
-                      setTextReview(dataCat.descriptionIll);
+                      setTextReview(dataCat.textGeneticDisease);
                     }}
                   >
                     ดูตัวอย่าง
@@ -677,7 +1055,25 @@ function ManageDataCat() {
             >
               ย้อนกลับ
             </ButtonNextPrev>
-            <ButtonNextPrev bg={"#B6C4A0"} bgHover={"#98af74"}>
+            <ButtonNextPrev
+              bg={"#B6C4A0"}
+              bgHover={"#98af74"}
+              onClick={() => {
+                if (
+                  dataCat.imgGeneticDisease === "" ||
+                  dataCat.textGeneticDisease === ""
+                ) {
+                  setCheckDataEmpty(true);
+                } else {
+                  setCheckDataEmpty(false);
+                  if (type === "edit") {
+                    handleEdit();
+                  } else {
+                    handleSave();
+                  }
+                }
+              }}
+            >
               เพิ่มข้อมูล
             </ButtonNextPrev>
           </DivButtonNext>

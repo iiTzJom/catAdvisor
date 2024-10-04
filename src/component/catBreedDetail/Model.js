@@ -56,35 +56,36 @@ const Line = styled.div`
 `;
 
 function CatModel({ data }) {
+  console.log("sssssssssssafdsdfsdf", data);
   return (
     <Contain>
       <DivModel>
         <DivLeft>
-          <ImageCat src={process.env.PUBLIC_URL + data?.pic1} />
+          <ImageCat src={data?.imgBody} />
         </DivLeft>
         <DivRight width={"true"} end={"true"}>
           <Title end={"true"}>ลักษณะร่างกาย</Title>
-          <Dcs end={"true"}>{ReactHtmlParser(data?.dcs1)}</Dcs>
+          <Dcs end={"true"}>{ReactHtmlParser(data?.textBody)}</Dcs>
         </DivRight>
       </DivModel>
       <Line />
       <DivModel>
         <DivLeft width={"true"}>
           <Title>ลักษณะนิสัย</Title>
-          <Dcs>{ReactHtmlParser(data?.dcs2)}</Dcs>
+          <Dcs>{ReactHtmlParser(data?.textPersonalTraits)}</Dcs>
         </DivLeft>
         <DivRight>
-          <ImageCat src={process.env.PUBLIC_URL + data?.pic2} />
+          <ImageCat src={data?.imgPersonalTraits} />
         </DivRight>
       </DivModel>
       <Line />
       <DivModel>
         <DivLeft>
-          <ImageCat src={process.env.PUBLIC_URL + data?.pic3} />
+          <ImageCat src={data?.imgGeneticDisease} />
         </DivLeft>
         <DivRight width={"true"} end={"true"}>
           <Title end={"true"}>โรคทางพันธุกรรม</Title>
-          <Dcs end={"true"}>{ReactHtmlParser(data?.dcs3)}</Dcs>
+          <Dcs end={"true"}>{ReactHtmlParser(data?.textGeneticDisease)}</Dcs>
         </DivRight>
       </DivModel>
     </Contain>

@@ -6,10 +6,10 @@ const Container = styled.div`
   background-color: #71a9db; /* Background of main page */
   height: 100vh;
 `;
-function AddEditDataCat() {
+function AddEditDataCat({ name }) {
   return (
     <Container>
-      <ManageDataCat />
+      <ManageDataCat name={name} />
     </Container>
   );
 }

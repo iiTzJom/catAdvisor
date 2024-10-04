@@ -1,8 +1,9 @@
 import styled from "@emotion/styled/macro";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactHtmlParser from "react-html-parser";
 import StarIcon from "@mui/icons-material/Star";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { getListCatBreeds } from "../../api/catBreeds";
 
 const Contain = styled.div`
   max-width: 100%;
@@ -105,38 +106,32 @@ function CompareCat() {
   const [selectedCat1, setSelectedCat1] = useState(1);
   const [selectedCat2, setSelectedCat2] = useState(2);
 
-  const dataCompare = [
-    {
-      id: 1,
-      name: "อเมริกันช็อตแฮร์ (American Short hair)",
-      personality: 8,
-      affectionate: 7,
-      grooming: 8,
-      friendly: 8,
-      pic: "/AmericanStand.png",
-      bgColor: "#B6C4A0 ",
-    },
-    {
-      id: 2,
-      name: "บริติชช็อตแฮร์ (British Short hair)",
-      personality: 9,
-      affectionate: 6,
-      grooming: 7,
-      friendly: 7,
-      pic: "/BritishStand.png",
-      bgColor: "#D7878A",
-    },
-    {
-      id: 3,
-      name: "สก๊อตติซโฟล์ด (Scottish Fold)",
-      personality: 9,
-      affectionate: 8,
-      grooming: 7,
-      friendly: 8,
-      pic: "/ScottishStand.png",
-      bgColor: "#EED7A1",
-    },
-  ];
+  const [dataCatBreeds, setDataCatBreedss] = useState([]);
+
+  useEffect(() => {
+    var newData = [];
+    const getData = getListCatBreeds()
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          Object.keys(data?.data?.data).map((key) => [
+            newData.push(data?.data?.data[key]),
+          ]);
+          setDataCatBreedss(newData);
+          setSelectedCat1(newData[0]?.id);
+          setSelectedCat2(newData[1]?.id);
+        }
+      })
+      .catch((err) => err);
+
+    return () => {
+      clearInterval(getData);
+    };
+  }, []);
+
+  useEffect(() => {
+    setSelectedCat1(dataCatBreeds[0]?.id);
+    setSelectedCat2(dataCatBreeds[1]?.id);
+  }, []);
 
   const handleCat1Change = (event) => {
     setSelectedCat1(event.target.value);
@@ -147,16 +142,16 @@ function CompareCat() {
   };
 
   const renderCatCard = (catId) => {
-    const data = dataCompare.find((cat) => cat.id === catId);
+    const data = dataCatBreeds.find((cat) => cat.id === catId);
 
     return (
-      <CardList bg={data.bgColor}>
-        <ImageCat src={process.env.PUBLIC_URL + data.pic} />
-        <Title>{ReactHtmlParser(data.name)}</Title>
+      <CardList bg={data?.backgroundColor}>
+        <ImageCat src={data?.imgGeneral} />
+        <Title>{data?.nameTH}</Title>
         <Rate>
           <Dcs>ลักษณะนิสัย:</Dcs>
           <RateRight>
-            {new Array(data.personality).fill("").map((_, index) => (
+            {new Array(data?.scoreCharacter).fill("").map((_, index) => (
               <StarIcon key={index} />
             ))}
           </RateRight>
@@ -164,7 +159,7 @@ function CompareCat() {
         <Rate>
           <Dcs>ความขี้อ้อน:</Dcs>
           <RateRight>
-            {new Array(data.affectionate).fill("").map((_, index) => (
+            {new Array(data?.scoreFriendliness).fill("").map((_, index) => (
               <StarIcon key={index} />
             ))}
           </RateRight>
@@ -172,7 +167,7 @@ function CompareCat() {
         <Rate>
           <Dcs>การดูแลขน:</Dcs>
           <RateRight>
-            {new Array(data.grooming).fill("").map((_, index) => (
+            {new Array(data?.scoreFurCare).fill("").map((_, index) => (
               <StarIcon key={index} />
             ))}
           </RateRight>
@@ -180,7 +175,7 @@ function CompareCat() {
         <Rate>
           <Dcs>เป็นมิตรต่อสัตว์เลี้ยงอื่นๆ:</Dcs>
           <RateRight>
-            {new Array(data.friendly).fill("").map((_, index) => (
+            {new Array(data?.scorePersistence).fill("").map((_, index) => (
               <StarIcon key={index} />
             ))}
           </RateRight>
@@ -200,9 +195,9 @@ function CompareCat() {
           <FormControl fullWidth>
             <InputLabel>เลือกสายพันธุ์แมว 1</InputLabel>
             <Select value={selectedCat1} onChange={handleCat1Change}>
-              {dataCompare.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {ReactHtmlParser(cat.name)}
+              {dataCatBreeds.map((cat) => (
+                <MenuItem key={cat?.id} value={cat?.id}>
+                  {cat?.nameTH}
                 </MenuItem>
               ))}
             </Select>
@@ -213,9 +208,9 @@ function CompareCat() {
           <FormControl fullWidth>
             <InputLabel>เลือกสายพันธุ์แมว 2</InputLabel>
             <Select value={selectedCat2} onChange={handleCat2Change}>
-              {dataCompare.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  {ReactHtmlParser(cat.name)}
+              {dataCatBreeds.map((cat) => (
+                <MenuItem key={cat.id} value={cat?.id}>
+                  {cat?.nameTH}
                 </MenuItem>
               ))}
             </Select>

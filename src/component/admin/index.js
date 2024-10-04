@@ -22,10 +22,11 @@ const DivBody = styled.div`
 `;
 function ManageAdmin() {
   const [type, setType] = useState(0);
-
+  const [name, setName] = useState("");
   sessionService
     .loadUser()
     .then((data) => {
+      setName(data.userName);
       if (data.type === undefined) {
         setType(0);
       } else {
@@ -44,13 +45,22 @@ function ManageAdmin() {
             <AdminSidebars />
           </DivSidebar>
           <DivBody>
-            {window.location.search === "?cat-data-list" && <AdminCatData />}
-            {window.location.search === "?add-edit-data-cat" && (
-              <AddEditDataCat />
+            {window.location.search === "?cat-data-list" && (
+              <AdminCatData name={name} />
             )}
+
+            {(window.location.search === "?add-edit-data-cat" ||
+              (window.location.search.split("&")[0] === "?add-edit-data-cat" &&
+                window.location.search.split("&").length === 2 &&
+                window.location.search.split("&")[1]?.indexOf("id") === 0)) && (
+              <AddEditDataCat name={name} />
+            )}
+
             {window.location.search === "?blog-data-list" && <BlogDataList />}
+
             {(window.location.search === "?blogCatData" ||
-              (window.location.search.split("&").length === 2 &&
+              (window.location.search.split("&")[0] === "?blogCatData" &&
+                window.location.search.split("&").length === 2 &&
                 window.location.search.split("&")[1]?.indexOf("id") === 0)) && (
               <BlogDataAdd />
             )}

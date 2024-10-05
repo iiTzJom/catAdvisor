@@ -127,6 +127,8 @@ function NotiVacineList({ name }) {
     }
   };
 
+  console.log("listVacineNoti", listVacineNoti);
+
   useEffect(() => {
     var newData = [];
     listVacineNoti.map((data) =>
@@ -142,7 +144,7 @@ function NotiVacineList({ name }) {
       })
     );
     setNewList(newData);
-  }, []);
+  }, [listVacineNoti]);
 
   const sendMessage = async () => {
     newList.map(async (data) => {
@@ -217,6 +219,8 @@ function NotiVacineList({ name }) {
       }
     });
   };
+
+  console.log("----------", newList);
   return (
     <Container>
       <DivButton>

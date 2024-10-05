@@ -127,6 +127,7 @@ function RegisterModal({ open, close }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAlert, setIsAlert] = useState(null);
   const [isRegis, setIsRegis] = useState(false);
+  const [message, setMessage] = useState("");
   const handleRegister = () => {
     if (dataRegister.firstName === "") {
       setIsAlert("firstName");
@@ -152,6 +153,7 @@ function RegisterModal({ open, close }) {
                 //modal สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน
                 setIsLoading(false);
                 setIsRegis(true);
+                setMessage(value.data.message);
               }
             })
             .catch((err) => err);
@@ -188,7 +190,11 @@ function RegisterModal({ open, close }) {
             </LoginLeft>
             <LoginRight>
               {isRegis ? (
-                "สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน"
+                <>
+                  {message === "This username has been registed"
+                    ? "Usernameนี้มีอยู่ในระบบ กรุณาสร้างUsernameใหม่อีกครั้ง"
+                    : "สมัครสมาชิกสำเร็จ กรุณายืนยันการสมัครสมาชิกที่อีเมลของท่าน"}
+                </>
               ) : (
                 <>
                   <LoginText>สมัครสมาชิก</LoginText>

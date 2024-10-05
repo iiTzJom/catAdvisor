@@ -1,7 +1,7 @@
 import styled from "@emotion/styled/macro";
 import React, { useEffect, useState } from "react";
 import { getListCatBreeds } from "../../api/catBreeds";
-
+import ReactHtmlParser from "react-html-parser";
 const CardList = styled.div`
   display: flex;
   width: 100%;
@@ -107,7 +107,7 @@ function ListCatBreed() {
         <CardList bg={data?.backgroundColor}>
           <DivLeft>
             <Title>{data?.nameTH}</Title>
-            <Dcs>{data?.textGeneral}</Dcs>
+            <Dcs>{ReactHtmlParser(data?.textGeneral)}</Dcs>
             <SeeMore
               onClick={() =>
                 (window.location.href = "/cat-breeds-detail?" + data?.id)

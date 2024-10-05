@@ -183,7 +183,7 @@ function Slide() {
               <DivButton>
                 <SeeMore
                   onClick={() =>
-                    (window.location.href = "/text-blog-list/" + data.id)
+                    (window.location.href = "/text-blog-list?" + data.id)
                   }
                 >
                   ดูเพิ่มเติม

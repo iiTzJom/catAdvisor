@@ -56,7 +56,6 @@ const Line = styled.div`
 `;
 
 function CatModel({ data }) {
-  console.log("sssssssssssafdsdfsdf", data);
   return (
     <Contain>
       <DivModel>

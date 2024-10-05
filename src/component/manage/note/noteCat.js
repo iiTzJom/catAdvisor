@@ -304,7 +304,7 @@ const CatNote = ({ name }) => {
             {listNote.map((record, index) => (
               <TableRow key={index}>
                 <TableData>
-                  {catsData.filter((v) => v.id === record.idCat)[0].nameCat}
+                  {catsData.filter((v) => v.id === record?.idCat)[0].nameCat}
                 </TableData>
                 <TableData>
                   {new Date(record?.noteDate).getDate() +
@@ -313,8 +313,8 @@ const CatNote = ({ name }) => {
                     "-" +
                     new Date(record?.noteDate).getFullYear()}
                 </TableData>
-                <TableData>{record.nameNote}</TableData>
-                <TableData>{record.text}</TableData>
+                <TableData>{record?.nameNote}</TableData>
+                <TableData>{record?.text}</TableData>
                 <TableData align="center">
                   <ConfirmButton
                     onClick={() => handleOpenNoteViews(record, "view")}

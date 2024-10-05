@@ -19,3 +19,7 @@ export const getCatBreedsDetail = async (id) => {
 export const updateCatBreeds = async (data) => {
   return axios.put(`http://localhost:3001/updateCatBreeds`, data);
 };
+
+export const getCatUser = async () => {
+  return axios.get(`http://localhost:3001/getCatUser`);
+};

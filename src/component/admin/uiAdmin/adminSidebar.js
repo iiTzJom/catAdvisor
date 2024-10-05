@@ -126,6 +126,12 @@ function AdminSidebars() {
       name: "ความรู้ทั่วไป",
       icon: "/heart_3319163.png",
     },
+    {
+      path: "?noti-vacine",
+      pathEdit: "-",
+      name: "แจ้งเตือนฉีดวัคซีน",
+      icon: "/medicon.png",
+    },
   ];
 
   const handleLogoClick = () => {

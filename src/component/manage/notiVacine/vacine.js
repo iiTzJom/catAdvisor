@@ -1,22 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import {
-  FormControl,
-  InputAdornment,
-  OutlinedInput,
-  IconButton,
-  Button,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Button, MenuItem } from "@mui/material";
 import AddVaccines from "./addVaccine";
 import AddIcon from "@mui/icons-material/Add";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditIcon from "@mui/icons-material/Edit"; // เพิ่มไอคอนแก้ไข
 import DeleteIcon from "@mui/icons-material/Delete"; // เพิ่มไอคอนลบ
-
+import { sessionService } from "redux-react-session";
+import AddToken from "./addTokenLine";
+import { getVacineByUser, deleteVacine } from "../../../api/userVacine";
+import { getCatByUser } from "../../../api/userCatData";
 //New Update
 
 const Container = styled.div`
@@ -26,43 +18,6 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px;
-`;
-
-const DivSearch = styled.div`
-  width: 100%;
-  text-align: center;
-  margin-bottom: 20px;
-
-  .MuiInputBase-root {
-    width: 80%;
-    background-color: #d9d9d9;
-    border-radius: 50px;
-    padding-right: 12px;
-  }
-
-  .MuiButtonBase-root {
-    background-color: #ffd6b3;
-    width: 105px;
-    height: 56px;
-    border-radius: 40px;
-  }
-
-  .MuiButtonBase-root:hover {
-    opacity: 0.8;
-  }
-
-  .MuiFormControl-root {
-    width: 100%;
-    text-align: center;
-    display: block;
-  }
-
-  .MuiFormLabel-root {
-    width: 672px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
 `;
 
 const Table = styled.div`
@@ -110,12 +65,7 @@ const TableData = styled.div`
 `;
 
 const Status = styled.span`
-  color: ${({ status }) =>
-    status === "completed"
-      ? "#4caf50"
-      : status === "overdue"
-      ? "#f44336"
-      : "#f59a83"};
+  color: ${({ status }) => status};
 `;
 
 const AddButton = styled(Button)`
@@ -125,6 +75,7 @@ const AddButton = styled(Button)`
   border-radius: 20px;
   font-size: 16px;
   margin-bottom: 20px;
+  margin-left: 20px;
   &:hover {
     background-color: #fa8466;
   }
@@ -176,108 +127,146 @@ const VaccinationPage = () => {
     },
   ]);
 
-  const [filteredData, setFilteredData] = React.useState(dataBlog);
-  const [keyword, setKeyword] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [openAddToken, setOpenAddToken] = React.useState(false);
   const [selectedData, setSelectedData] = React.useState(null); // สำหรับเก็บข้อมูลแมวที่เลือก
-  const [anchorEl, setAnchorEl] = React.useState(null); // สำหรับ dropdown
   const [isType, setIsType] = useState("create");
+  const [isNoti, setIsNoti] = useState(false);
+  const [name, setName] = useState("");
+  const [token, setToken] = useState("");
+  const [vacineData, setVacineData] = useState([]);
+  const [dataCat, setDataCat] = useState([]);
 
-  React.useEffect(() => {
-    if (keyword === "") {
-      setFilteredData(dataBlog);
-    } else {
-      const lowercasedKeyword = keyword.toLowerCase();
-      const filtered = dataBlog.filter((item) =>
-        item.name.toLowerCase().includes(lowercasedKeyword)
-      );
-      setFilteredData(filtered);
+  sessionService
+    .loadUser()
+    .then((data) => {
+      setName(data.userName);
+      setToken(data.accessToken);
+      if (data.accessToken !== "") {
+        setIsNoti(true);
+      }
+    })
+    .catch((err) => {
+      //window.location.href = "/";
+    });
+
+  useEffect(() => {
+    var newData = [];
+    if (name !== "" || !name) {
+      const getData = getCatByUser(name)
+        .then((data) => {
+          if (data?.data?.code === 200) {
+            Object.keys(data?.data?.data).map((key) => [
+              newData.push(data?.data?.data[key]),
+            ]);
+            //setListNote(newData);
+            setDataCat(newData);
+          }
+        })
+        .catch((err) => err);
+      return () => {
+        clearInterval(getData); // ใช้ clearInterval แทน destroy
+      };
     }
-  }, [keyword, dataBlog]);
+  }, [name]);
 
-  const handleConfirm = (id) => {
-    setDataBlog((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, status: "completed" } : item
-      )
-    );
-  };
+  useEffect(() => {
+    var newData = [];
+    if (name !== "") {
+      const getData = getVacineByUser(name)
+        .then((data) => {
+          if (data?.data?.code === 200) {
+            Object.keys(data?.data?.data).map((key) => [
+              newData.push(data?.data?.data[key]),
+            ]);
+            setVacineData(newData);
+            // setDataDB(newData);
+          }
+        })
+        .catch((err) => err);
 
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
+      return () => {
+        clearInterval(getData); // ใช้ clearInterval แทน destroy
+      };
+    }
+  }, [name]);
 
   const handleEdit = (id) => {
-    const dataToEdit = dataBlog.find((item) => item.id === id);
+    const dataToEdit = vacineData.find((item) => item.id === id);
     setSelectedData(dataToEdit); // ตั้งค่า selectedData
     setOpen(true); // เปิด Modal
-    handleCloseMenu();
     setIsType("edit");
   };
 
   const handleDelete = (id) => {
-    // ฟังก์ชันการลบที่นี่
-    handleCloseMenu();
-  };
-
-  const handleSave = (updatedData) => {
-    setDataBlog((prevData) =>
-      prevData.map((item) => (item.id === updatedData.id ? updatedData : item))
-    );
-    setOpen(false);
-    setSelectedData(null); // ล้างข้อมูลที่เลือก
+    deleteVacine(name, id)
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          window.location.href = "/Manage?notiVacine";
+        }
+      })
+      .catch((err) => err);
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case "completed":
+      case true:
         return "เสร็จสิ้น";
-      case "overdue":
-        return "ล่าช้า";
       default:
         return "กำลังดำเนินการ";
     }
   };
 
+  const diffDate = (date1, date2) => {
+    if (new Date(date1) < new Date()) {
+      return false;
+    } else {
+      const d1 = new Date(date1);
+      const d2 = new Date();
+
+      const diffTime = Math.abs(d2 - d1);
+
+      // แปลงจาก milliseconds เป็นวัน
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays;
+    }
+  };
+
   return (
     <Container>
-      <DivSearch>
-        <FormControl
-          sx={{ m: 1, width: "785px", "& fieldset": { border: "none" } }}
-          variant="outlined"
-        >
-          <OutlinedInput
-            id="outlined-adornment-password"
-            type={"text"}
-            value={keyword}
-            placeholder="ค้นหาชื่อ"
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="search"
-                  onClick={() => setKeyword(keyword)}
-                  edge="end"
-                >
-                  <SearchIcon style={{ color: "white" }} />
-                </IconButton>
-              </InputAdornment>
-            }
-            onChange={(e) => setKeyword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") setKeyword(e.target.value);
-            }}
-          />
-        </FormControl>
-      </DivSearch>
-
       <Table>
+        {isNoti === true ? (
+          <AddButton
+            onClick={() => {
+              setOpenAddToken(true);
+            }}
+            style={{ backgroundColor: "#16c464" }}
+          >
+            <img
+              src={process.env.PUBLIC_URL + "/line.png"}
+              style={{ width: "30px", paddingRight: "10px" }}
+            />
+            แก้ไข access token
+          </AddButton>
+        ) : (
+          <AddButton
+            onClick={() => {
+              setOpenAddToken(true);
+            }}
+            style={{ backgroundColor: "#16c464" }}
+          >
+            <img
+              src={process.env.PUBLIC_URL + "/line.png"}
+              style={{ width: "30px", paddingRight: "10px" }}
+            />
+            รับการแจ้งเตือนผ่าน Line
+          </AddButton>
+        )}
         <AddButton
           onClick={() => {
             setOpen(true);
+            setSelectedData(null);
             setIsType("create");
           }}
         >
@@ -285,55 +274,64 @@ const VaccinationPage = () => {
           เพิ่มข้อมูลการฉีดวัคซีน
         </AddButton>
         <TableHeader>
-          <TableHeaderItem>Tag Id</TableHeaderItem>
+          {/* <TableHeaderItem>Tag Id</TableHeaderItem> */}
           <TableHeaderItem>ชื่อแมว</TableHeaderItem>
           <TableHeaderItem>วันที่ฉีด</TableHeaderItem>
           <TableHeaderItem>วัคซีนวันนี้</TableHeaderItem>
           <TableHeaderItem>วันฉีดครั้งถัดไป</TableHeaderItem>
           <TableHeaderItem>วัคซีนครั้งถัดไป</TableHeaderItem>
           <TableHeaderItem>สถานะ</TableHeaderItem>
-          <TableHeaderItem style={{ textAlign: "center" }}>
-            แก้ไข
-          </TableHeaderItem>
+          <TableHeaderItem style={{ textAlign: "center" }}></TableHeaderItem>
         </TableHeader>
-        {filteredData.map((row) => (
-          <TableRow key={row.id}>
-            <TableData>{row.tagId}</TableData>
-            <TableData>{row.name}</TableData>
-            <TableData>{row.injectionDate}</TableData>
-            <TableData>{row.vaccineToday}</TableData>
-            <TableData>{row.nextInjectionDate}</TableData>
-            <TableData>{row.nextVaccine}</TableData>
+        {vacineData.map((row) => (
+          <TableRow key={row?.id}>
+            {/* <TableData>{row.tagId}</TableData> */}
             <TableData>
-              <Status status={row.status}>{getStatusText(row.status)}</Status>
+              {dataCat?.filter((v) => v?.id === row?.idCat)[0]?.nameCat}
             </TableData>
-            <TableData style={{ textAlign: "center" }}>
-              <IconButton onClick={handleOpenMenu}>
-                <MoreHorizIcon />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleCloseMenu}
+            <TableData>{row?.vacineDate}</TableData>
+            <TableData>{row?.vacineName}</TableData>
+            <TableData>{row?.vacineDateNext}</TableData>
+            <TableData>{row.vacineNameNext}</TableData>
+            <TableData>
+              <Status
+                status={
+                  diffDate(new Date(row?.vacineDateNext)) === false
+                    ? "#f44336"
+                    : row?.status
+                    ? "#4caf50"
+                    : "#f59a83"
+                }
               >
-                <MenuItem onClick={() => handleEdit(row.id)}>
-                  <EditIcon style={{ marginRight: "8px" }} />
-                  แก้ไข
-                </MenuItem>
-                <MenuItem onClick={() => handleDelete(row.id)}>
-                  <DeleteIcon style={{ marginRight: "8px" }} />
-                  ลบ
-                </MenuItem>
-              </Menu>
+                {diffDate(new Date(row.vacineDateNext)) === false
+                  ? "ล่าช้า"
+                  : getStatusText(row?.status)}
+              </Status>
+            </TableData>
+            <TableData style={{ textAlign: "center", display: "flex" }}>
+              <MenuItem onClick={() => handleEdit(row.id)}>
+                <EditIcon style={{ marginRight: "8px" }} />
+                แก้ไข
+              </MenuItem>
+              <MenuItem onClick={() => handleDelete(row.id)}>
+                <DeleteIcon style={{ marginRight: "8px" }} />
+                ลบ
+              </MenuItem>
             </TableData>
           </TableRow>
         ))}
       </Table>
-
+      <AddToken
+        open={openAddToken}
+        handleClose={() => setOpenAddToken(false)}
+      />
       <AddVaccines
         open={open}
         handleClose={() => setOpen(false)}
         type={isType}
+        name={name}
+        token={token}
+        dataVacine={selectedData}
       />
     </Container>
   );

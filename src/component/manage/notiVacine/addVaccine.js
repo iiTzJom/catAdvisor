@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Button,
@@ -11,6 +11,13 @@ import {
 } from "@mui/material";
 import styled from "@emotion/styled";
 import Switch from "@mui/material/Switch";
+import {
+  createVacine,
+  createVacineNoti,
+  updateVacine,
+} from "../../../api/userVacine";
+import { getCatByUser } from "../../../api/userCatData";
+import { Token } from "@mui/icons-material";
 
 const ModalBackdrop = styled(Modal)`
   display: flex;
@@ -76,18 +83,123 @@ const vaccines = [
   "วัคซีนป้องกันโรคหัด",
   "วัคซีนป้องกันโรคบิด",
   "วัคซีนป้องกันโรคซาร์ส",
-  // เพิ่มชื่อวัคซีนแมวอื่น ๆ ตามต้องการ
 ];
 
-const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
-  const [formData, setFormData] = React.useState(data || {});
+const AddVaccines = ({ open, handleClose, token, type, name, dataVacine }) => {
+  const [formData, setFormData] = useState({
+    idCat: "",
+    vacineName: "",
+    vacineDate: "",
+    vacineNameNext: "",
+    vacineDateNext: "",
+    status: false,
+    createBy: "",
+    id: "",
+  });
+  const [dataDB, setDataDB] = useState([]);
 
-  React.useEffect(() => {
-    setFormData(data || {}); // ตั้งค่าข้อมูลเมื่อเปิด Modal
-  }, [data]);
+  useEffect(() => {
+    if (dataVacine === null) {
+      setFormData({
+        idCat: "",
+        vacineName: "",
+        vacineDate: "",
+        vacineNameNext: "",
+        vacineDateNext: "",
+        status: false,
+        createBy: "",
+        id: "",
+      });
+    } else {
+      setFormData({
+        idCat: dataVacine.idCat,
+        vacineName: dataVacine.vacineName,
+        vacineDate: dataVacine.vacineDate,
+        vacineNameNext: dataVacine.vacineNameNext,
+        vacineDateNext: dataVacine.vacineDateNext,
+        status: dataVacine.status,
+        createBy: dataVacine.createBy,
+        id: dataVacine.id,
+      });
+    }
+  }, [dataVacine]);
+  useEffect(() => {
+    var newData = [];
+    if (name !== "" || !name) {
+      const getData = getCatByUser(name)
+        .then((data) => {
+          if (data?.data?.code === 200) {
+            Object.keys(data?.data?.data).map((key) => [
+              newData.push(data?.data?.data[key]),
+            ]);
+            //setListNote(newData);
+            setDataDB(newData);
+          }
+        })
+        .catch((err) => err);
+      return () => {
+        clearInterval(getData); // ใช้ clearInterval แทน destroy
+      };
+    }
+  }, [name]);
 
-  const handleSubmit = () => {
-    onSave(formData); // เรียกใช้ฟังก์ชันบันทึกข้อมูล
+  const handleSubmit = async () => {
+    const dataSave = {
+      idCat: formData.idCat,
+      vacineName: formData.vacineName,
+      vacineDate: formData.vacineDate,
+      vacineNameNext: formData.vacineNameNext,
+      vacineDateNext: formData.vacineDateNext,
+      status: formData.status,
+      createBy: name,
+    };
+
+    await createVacine(dataSave)
+      .then(async (data) => {
+        if (data?.data?.code === 200) {
+          const dataSaveNoti = {
+            idVacine: data?.data?.id,
+            accessToken: token,
+            idCat: formData.idCat,
+            vacineName: formData.vacineName,
+            vacineDate: formData.vacineDate,
+            vacineNameNext: formData.vacineNameNext,
+            vacineDateNext: formData.vacineDateNext,
+            status: formData.status,
+            createBy: name,
+          };
+          await createVacineNoti(dataSaveNoti)
+            .then((data) => {
+              if (data?.data?.code === 200) {
+                window.location.href = "/Manage?notiVacine";
+              }
+            })
+            .catch((err) => err);
+        }
+      })
+      .catch((err) => err);
+    handleClose();
+  };
+
+  const handleEdit = async () => {
+    const dataSave = {
+      idCat: formData.idCat,
+      vacineName: formData.vacineName,
+      vacineDate: formData.vacineDate,
+      vacineNameNext: formData.vacineNameNext,
+      vacineDateNext: formData.vacineDateNext,
+      status: formData.status,
+      updateBy: name,
+      id: formData.id,
+    };
+
+    await updateVacine(dataSave)
+      .then(async (data) => {
+        if (data?.data?.code === 200) {
+          window.location.href = "/Manage?notiVacine";
+        }
+      })
+      .catch((err) => err);
     handleClose();
   };
 
@@ -103,14 +215,15 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
             <Select
               labelId="cat-name-label"
               id="catName"
-              value={formData.name || ""}
+              value={formData.idCat}
               onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
+                setFormData({ ...formData, idCat: e.target.value })
               }
               label="ชื่อแมว"
             >
-              <MenuItem value="ฟุกุ">ฟุกุ</MenuItem>
-              <MenuItem value="เลโอ">เลโอ</MenuItem>
+              {dataDB.map((data) => (
+                <MenuItem value={data.id}>{data.nameCat}</MenuItem>
+              ))}
             </Select>
           </FormControl>
           <StyledFormControl variant="outlined" required>
@@ -118,9 +231,9 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
             <Select
               labelId="vaccineToday-label"
               id="vaccineToday"
-              value={formData.vaccineToday || ""}
+              value={formData.vacineName}
               onChange={(e) =>
-                setFormData({ ...formData, vaccineToday: e.target.value })
+                setFormData({ ...formData, vacineName: e.target.value })
               }
               label="วัคซีนวันนี้"
             >
@@ -136,20 +249,9 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
             id="injectionDate"
             label="วันที่ฉีด"
             type="date"
-            value={formData.date || ""}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            InputLabelProps={{ shrink: true }}
-            variant="outlined"
-            required
-          />
-          <StyledTextField
-            fullWidth
-            id="nextInjectionDate"
-            label="วันฉีดครั้งถัดไป"
-            type="date"
-            value={formData.nextVaccineDate || ""}
+            value={formData.vacineDate}
             onChange={(e) =>
-              setFormData({ ...formData, nextVaccineDate: e.target.value })
+              setFormData({ ...formData, vacineDate: e.target.value })
             }
             InputLabelProps={{ shrink: true }}
             variant="outlined"
@@ -160,9 +262,9 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
             <Select
               labelId="nextVaccine-label"
               id="nextVaccine"
-              value={formData.nextVaccine || ""}
+              value={formData.vacineNameNext}
               onChange={(e) =>
-                setFormData({ ...formData, nextVaccine: e.target.value })
+                setFormData({ ...formData, vacineNameNext: e.target.value })
               }
               label="วัคซีนครั้งถัดไป"
             >
@@ -173,8 +275,29 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
               ))}
             </Select>
           </StyledFormControl>
+          <StyledTextField
+            fullWidth
+            id="nextInjectionDate"
+            label="วันฉีดครั้งถัดไป"
+            type="date"
+            value={formData.vacineDateNext || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, vacineDateNext: e.target.value })
+            }
+            InputLabelProps={{ shrink: true }}
+            variant="outlined"
+            required
+          />
+
           <DivSwitch>
-            <Switch {...label} defaultChecked color="success" />
+            <Switch
+              {...label}
+              defaultChecked={formData.status}
+              color="success"
+              onChange={(e) => {
+                setFormData({ ...formData, status: e.target.checked });
+              }}
+            />
             <DivTextSwitch>ดำเนินการเสร็จสิ้น</DivTextSwitch>
           </DivSwitch>
           <Box
@@ -183,8 +306,13 @@ const AddVaccines = ({ open, handleClose, data, onSave, type }) => {
             alignItems="center"
             marginTop={2}
           >
-            <StyledSubmitButton variant="contained" onClick={handleSubmit}>
-              เพิ่ม
+            <StyledSubmitButton
+              variant="contained"
+              onClick={() =>
+                dataVacine !== null ? handleEdit() : handleSubmit()
+              }
+            >
+              {dataVacine !== null ? "แก้ไข" : "เพิ่มข้อมูล"}
             </StyledSubmitButton>
           </Box>
         </form>

@@ -150,7 +150,8 @@ function LoginModal({ open, close, register, forgetpassword }) {
                   dataUser.lastName,
                   dataUser.email,
                   dataUser.imgProfile,
-                  dataUser.type
+                  dataUser.type,
+                  dataUser.accessToken
                 )
               );
 
@@ -195,7 +196,6 @@ function LoginModal({ open, close, register, forgetpassword }) {
               }}
               error={isAlert === "userName" && true}
             />
-
             <FormControl sx={{ width: "425px" }} variant="outlined">
               <InputLabel htmlFor="outlined-adornment-password">
                 Password
@@ -238,6 +238,14 @@ function LoginModal({ open, close, register, forgetpassword }) {
                 <Alert severity="error">รหัสผ่านไม่ถูกต้อง</Alert>
               </Stack>
             )}
+            {message === "user not found" && (
+              <Stack sx={{ width: "100%" }} spacing={2}>
+                <Alert severity="error">
+                  ไม่มี userName ในระบบกรุณาสมัครสมาชิก
+                </Alert>
+              </Stack>
+            )}
+
             <LoginButton onClick={() => handleLogin()}>ล็อกอิน</LoginButton>
             <RegisterText onClick={register}>
               ยังไม่มีบัญชี? Create Account

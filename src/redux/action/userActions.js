@@ -7,7 +7,8 @@ export const loginUser = (
   lastName,
   email,
   imgProfile,
-  type
+  type,
+  accessToken
 ) => {
   return () => {
     sessionService.saveSession(true);
@@ -19,6 +20,7 @@ export const loginUser = (
       email: email,
       imgProfile: imgProfile,
       type: type,
+      accessToken: accessToken,
     });
   };
 };

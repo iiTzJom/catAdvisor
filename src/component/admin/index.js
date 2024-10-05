@@ -4,6 +4,7 @@ import AdminCatData from "./catData";
 import AddEditDataCat from "./editDataCat";
 import BlogDataAdd from "./blogList/addBlogData";
 import BlogDataList from "./blogListData/blogListData";
+import NotiVacinePage from "./notiVacine";
 import { sessionService } from "redux-react-session";
 import { useState } from "react";
 const Contain = styled.div`
@@ -64,6 +65,7 @@ function ManageAdmin() {
                 window.location.search.split("&")[1]?.indexOf("id") === 0)) && (
               <BlogDataAdd />
             )}
+            {window.location.search === "?noti-vacine" && <NotiVacinePage />}
           </DivBody>
         </>
       )}

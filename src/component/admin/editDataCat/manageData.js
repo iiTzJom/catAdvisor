@@ -302,7 +302,6 @@ function ManageDataCat({ name }) {
     }
   }, []);
 
-  console.log("sssssss", dataCat);
   const handleSave = async () => {
     setIsLoading(true);
     var dataSave = {

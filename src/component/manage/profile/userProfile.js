@@ -87,7 +87,6 @@ const DivIconLoading = styled.div`
 function UsersProfile({ name }) {
   const [isEditable, setIsEditable] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState("https://via.placeholder.com/100");
-  const [gender, setGender] = useState("ชาย"); // สถานะสำหรับเลือกเพศ
   const [isLoading, setIsLoading] = useState(false);
   const [checkDataEmpty, setCheckDataEmpty] = useState(false);
   const [imgFile, setImgfile] = useState("");
@@ -108,10 +107,6 @@ function UsersProfile({ name }) {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleGenderChange = (event) => {
-    setGender(event.target.value);
   };
 
   useEffect(() => {
@@ -166,7 +161,8 @@ function UsersProfile({ name }) {
                         data.data.data.lastName,
                         data.data.data.email,
                         data.data.data.imgProfile,
-                        data.data.data.type
+                        data.data.data.type,
+                        data.data.data.accessToken
                       )
                     );
 

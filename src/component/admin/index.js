@@ -5,6 +5,7 @@ import AddEditDataCat from "./editDataCat";
 import BlogDataAdd from "./blogList/addBlogData";
 import BlogDataList from "./blogListData/blogListData";
 import NotiVacinePage from "./notiVacine";
+import ListCatUser from "./catUserList/userCatList";
 import { sessionService } from "redux-react-session";
 import { useState } from "react";
 const Contain = styled.div`
@@ -66,6 +67,7 @@ function ManageAdmin() {
               <BlogDataAdd />
             )}
             {window.location.search === "?noti-vacine" && <NotiVacinePage />}
+            {window.location.search === "?user-cat-list" && <ListCatUser />}
           </DivBody>
         </>
       )}

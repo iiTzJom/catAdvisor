@@ -10,6 +10,11 @@ const Contain = styled.div`
   max-width: 100%;
   height: 100vh;
   background-color: #eae7e6;
+  position: fixed; /* ทำให้ Sidebar ติดอยู่กับที่ */
+  top: 0; /* ระบุตำแหน่งบนสุดของ Sidebar */
+  left: 0; /* ระบุตำแหน่งซ้ายสุดของ Sidebar */
+  width: 250px; /* กำหนดความกว้างของ Sidebar */
+  z-index: 1000; /* เพื่อให้ Sidebar อยู่ด้านบนสุดหากมีองค์ประกอบอื่นทับ */
 `;
 
 const ContainInside = styled.div`
@@ -131,6 +136,12 @@ function AdminSidebars() {
       pathEdit: "-",
       name: "แจ้งเตือนฉีดวัคซีน",
       icon: "/medicon.png",
+    },
+    {
+      path: "?user-cat-list",
+      pathEdit: "-",
+      name: "ข้อมูลแมวผู้เลี้ยง",
+      icon: "/caticon.png",
     },
   ];
 

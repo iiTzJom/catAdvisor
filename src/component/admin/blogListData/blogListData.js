@@ -197,7 +197,16 @@ function BlogDataList() {
                       <EditIcon style={{ marginRight: "8px" }} />
                       แก้ไข
                     </MenuItem>
-                    <MenuItem onClick={() => deleteData(blog?.id)}>
+                    <MenuItem
+                      onClick={() => {
+                        const confirmDelete = window.confirm(
+                          "คุณต้องการลบข้อมูลนี้ใช่หรือไม่?"
+                        );
+                        if (confirmDelete) {
+                          deleteData(blog?.id);
+                        }
+                      }}
+                    >
                       <DeleteIcon style={{ marginRight: "8px" }} />
                       ลบ
                     </MenuItem>

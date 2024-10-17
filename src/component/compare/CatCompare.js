@@ -149,7 +149,7 @@ function CompareCat() {
         <ImageCat src={data?.imgGeneral} />
         <Title>{data?.nameTH}</Title>
         <Rate>
-          <Dcs>ลักษณะนิสัย:</Dcs>
+          <Dcs>ศรีษะ:</Dcs>
           <RateRight>
             {new Array(data?.scoreCharacter).fill("").map((_, index) => (
               <StarIcon key={index} />
@@ -157,7 +157,7 @@ function CompareCat() {
           </RateRight>
         </Rate>
         <Rate>
-          <Dcs>ความขี้อ้อน:</Dcs>
+          <Dcs>ลำตัว:</Dcs>
           <RateRight>
             {new Array(data?.scoreFriendliness).fill("").map((_, index) => (
               <StarIcon key={index} />
@@ -173,7 +173,7 @@ function CompareCat() {
           </RateRight>
         </Rate>
         <Rate>
-          <Dcs>เป็นมิตรต่อสัตว์เลี้ยงอื่นๆ:</Dcs>
+          <Dcs>ความเป็นมิตร:</Dcs>
           <RateRight>
             {new Array(data?.scorePersistence).fill("").map((_, index) => (
               <StarIcon key={index} />
@@ -188,7 +188,9 @@ function CompareCat() {
     <Contain>
       <CompareBanner>
         <TextBanner>เปรียบเทียบสายพันธุ์แมว</TextBanner>
-        <DcsBanner>มาดูกันว่าแมวสายพันธุ์ไหนเหมาะสมกับคุณมากที่สุด</DcsBanner>
+        <DcsBanner>
+          อ้างอิงข้อมูลคะเเนนจากสมาคม The International Cat Association (TICA)
+        </DcsBanner>
       </CompareBanner>
       <DivContent>
         <DivCompare>

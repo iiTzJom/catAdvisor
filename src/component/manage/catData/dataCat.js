@@ -2,8 +2,27 @@ import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AddCatModal from "./addCat";
+import ViewVaccineHistoryModal from "./history";
+import VaccineProgram from "./vaccineProgramModal";
+import IconButton from "@mui/material/IconButton";
+import VaccineIcon from "@mui/icons-material/HealthAndSafety";
+import axios from "axios";
 import { getCatByUser, deleteCatByUser } from "../../../api/userCatData";
+import { getVaccineHistory } from "../../../api/userVacine";
+
+// Moved the getCatById function outside the component
+export const getCatById = async (catId) => {
+  try {
+    const response = await axios.get(`/api/cats/${catId}`);
+    return response.data; // Assuming the API returns the cat's data in response.data
+  } catch (err) {
+    console.error(err);
+    throw new Error("Failed to fetch cat data by ID");
+  }
+};
+
 const Container = styled.div`
   background-color: #71a9db;
   max-height: 100vh;
@@ -42,6 +61,7 @@ const Card = styled.div`
   text-align: center;
   width: 250px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
 `;
 
 const CardAvatarContainer = styled.div`
@@ -56,21 +76,7 @@ const CardAvatar = styled.img`
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #ccc; /* กรณีไม่มีรูปภาพ */
-`;
-
-const UploadButton = styled.label`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: #fff;
-  border-radius: 50%;
-  padding: 4px;
-  border: 2px solid #1976d2;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #ccc;
 `;
 
 const CardContent = styled.div`
@@ -83,53 +89,74 @@ const CardButton = styled(Button)`
   margin-top: 10px;
   width: 100%;
   background-color: ${(props) =>
-    props.variant === "edit" ? "#ffb74d" : "#ef5350"};
+    props.variant === "edit"
+      ? "#ffb74d"
+      : props.variant === "history"
+      ? "#64b5f6"
+      : "#ef5350"};
   color: white;
   &:hover {
     background-color: ${(props) =>
-      props.variant === "edit" ? "#ffa726" : "#e53935"};
+      props.variant === "edit"
+        ? "#ffa726"
+        : props.variant === "history"
+        ? "#42a5f5"
+        : "#e53935"};
   }
 `;
 
 const calculateAge = (birthDate) => {
   const today = new Date();
   const birth = new Date(birthDate);
-
-  const age = today.getFullYear() - birth.getFullYear(); // คำนวณปี
-
-  const monthDiff = today.getMonth() - birth.getMonth(); // คำนวณเดือน
-
-  return age + " ปี" + " " + monthDiff + " เดือน";
+  const age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  return `${age} ปี ${monthDiff} เดือน`;
 };
 
 function DataCats({ name }) {
   const [catsData, setCatsData] = useState([]);
+  const [error, setError] = useState(null);
+  const [isAddCatModalOpen, setIsAddCatModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isVaccineProgramModalOpen, setIsVaccineProgramModalOpen] =
+    useState(false);
+  const [selectedCat, setSelectedCat] = useState(null);
+  const [vaccineHistory, setVaccineHistory] = useState([]);
+  const [typeModal, setTypeModal] = useState("Create");
+  const [selectedCatId, setSelectedCatId] = useState(null);
+  const [filteredVaccineHistory, setFilteredVaccineHistory] = useState([]);
 
   useEffect(() => {
-    var newData = [];
-    const getData = getCatByUser(name)
-      .then((data) => {
+    const getData = async () => {
+      try {
+        const data = await getCatByUser(name);
         if (data?.data?.code === 200) {
-          Object.keys(data?.data?.data).map((key) => [
-            newData.push(data?.data?.data[key]),
-          ]);
+          const newData = Object.values(data.data.data);
           setCatsData(newData);
-          // setDataDB(newData);
         }
-      })
-      .catch((err) => err);
-
-    return () => {
-      clearInterval(getData); // ใช้ clearInterval แทน destroy
+      } catch (err) {
+        setError("Failed to fetch cat data. Please try again.");
+        console.error(err);
+      }
     };
-  }, []);
 
-  const [isAddCatModalOpen, setIsAddCatModalOpen] = useState(false);
-  const [selectedCat, setSelectedCat] = useState(null);
-  const [typeModal, setTypeModal] = useState("Create");
+    getData();
+  }, [name]);
 
   const openAddCatModal = () => setIsAddCatModalOpen(true);
   const closeAddCatModal = () => setIsAddCatModalOpen(false);
+  const openHistoryModal = () => setIsHistoryModalOpen(true);
+  const closeHistoryModal = () => setIsHistoryModalOpen(false);
+
+  const openVaccineProgramModal = (catId) => {
+    setSelectedCatId(catId); // Using catId instead of catName
+    setIsVaccineProgramModalOpen(true);
+  };
+
+  const closeVaccineProgramModal = () => {
+    setSelectedCatId(null); // Clear selected cat ID
+    setIsVaccineProgramModalOpen(false);
+  };
 
   const handelDelete = (id) => {
     deleteCatByUser(name, id)
@@ -138,11 +165,29 @@ function DataCats({ name }) {
           window.location.href = "/Manage?catData";
         }
       })
-      .catch((err) => err);
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const viewVaccineHistory = (catName) => {
+    getVaccineHistory({ userName: name, catName })
+      .then((data) => {
+        if (data?.data?.code === 200) {
+          const historyData = data.data.data;
+          const historyArray = Object.values(historyData);
+          const filteredData = historyArray.filter(
+            (history) => history.idCat === catName
+          );
+          setFilteredVaccineHistory(filteredData);
+        }
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
     <Container>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <Header>
         <AddButton
           startIcon={<AddIcon />}
@@ -159,7 +204,6 @@ function DataCats({ name }) {
       <CardsContainer>
         {catsData.length > 0 ? (
           catsData.map((cat) => {
-            const { years, months, totalMonths } = calculateAge(cat.birthDate);
             return (
               <Card key={cat.id}>
                 <CardAvatarContainer>
@@ -181,6 +225,24 @@ function DataCats({ name }) {
                   </p>
                 </CardContent>
 
+                <IconButton
+                  onClick={() => openVaccineProgramModal(cat.id)}
+                  sx={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    color: "#ffffff",
+                    backgroundColor: "#71A9DB",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                    "&:hover": {
+                      backgroundColor: "#5692b6",
+                      boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
+                    },
+                  }}
+                >
+                  <VaccineIcon />
+                </IconButton>
+
                 <CardButton
                   variant="edit"
                   onClick={() => {
@@ -197,6 +259,15 @@ function DataCats({ name }) {
                 >
                   ลบ
                 </CardButton>
+                <CardButton
+                  variant="history"
+                  onClick={() => {
+                    viewVaccineHistory(cat.id); // Pass cat id for history
+                    openHistoryModal();
+                  }}
+                >
+                  ดูประวัติการรักษา
+                </CardButton>
               </Card>
             );
           })
@@ -212,13 +283,16 @@ function DataCats({ name }) {
         catData={selectedCat}
         name={name}
       />
-
-      {/* <EditCatModal
-        open={isEditCatModalOpen}
-        cat={selectedCat}
-        handleClose={closeEditCatModal}
-        handleSubmit={handleEditCat}
-      /> */}
+      <ViewVaccineHistoryModal
+        open={isHistoryModalOpen}
+        handleClose={closeHistoryModal}
+        vaccineHistory={filteredVaccineHistory}
+      />
+      <VaccineProgram
+        open={isVaccineProgramModalOpen}
+        handleClose={closeVaccineProgramModal}
+        selectedCatId={selectedCatId}
+      />
     </Container>
   );
 }

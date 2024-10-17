@@ -3,6 +3,7 @@ import { Fade, Slide } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
 import React, { useEffect, useState } from "react";
 import { getListCatBreeds } from "../../api/catBreeds";
+import ReactHtmlParser from "react-html-parser";
 const Contain = styled.div`
   position: relative;
   padding-left: 240px;
@@ -60,7 +61,11 @@ const BreedText = styled.div`
 `;
 
 const BreedText2 = styled.div`
-  text-align: end;
+  display: -webkit-box;
+  -webkit-line-clamp: 6; /* กำหนดจำนวนบรรทัด */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const Square = styled.div`
@@ -144,7 +149,7 @@ function CatBreed() {
               </DivLeft>
               <DivRight>
                 <DivRightInside>
-                  <BreedText2>{data.textGeneral}</BreedText2>
+                  <BreedText2>{ReactHtmlParser(data.textGeneral)}</BreedText2>
                 </DivRightInside>
               </DivRight>
             </DivImage>

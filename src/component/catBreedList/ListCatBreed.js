@@ -29,6 +29,11 @@ const Title = styled.div`
 const Dcs = styled.div`
   font-size: 20px;
   width: 80%;
+  display: -webkit-box;
+  -webkit-line-clamp: 6; /* กำหนดจำนวนบรรทัด */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const SeeMore = styled.div`

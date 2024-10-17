@@ -9,7 +9,6 @@ import { sessionService } from "redux-react-session";
 import AddToken from "./addTokenLine";
 import { getVacineByUser, deleteVacine } from "../../../api/userVacine";
 import { getCatByUser } from "../../../api/userCatData";
-//New Update
 
 const Container = styled.div`
   background-color: #71a9db;

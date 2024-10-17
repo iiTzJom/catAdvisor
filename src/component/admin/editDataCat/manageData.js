@@ -593,12 +593,12 @@ function ManageDataCat({ name }) {
               </AdditionalDetailsWrapper>
               <RatingContainer>
                 <RatingItem>
-                  <Label>ลักษณะนิสัย</Label>
+                  <Label>ศรีษะ</Label>
                   <TextField value={dataCat.scoreCharacter} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCat.scoreCharacter < 10 &&
+                        dataCat.scoreCharacter < 5 &&
                         setDataCat({
                           ...dataCat,
                           scoreCharacter: dataCat.scoreCharacter + 1,
@@ -618,12 +618,12 @@ function ManageDataCat({ name }) {
                 </RatingItem>
 
                 <RatingItem>
-                  <Label>ความขี้อ้อน</Label>
+                  <Label>ลำตัว</Label>
                   <TextField value={dataCat.scorePersistence} />
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCat.scorePersistence < 10 &&
+                        dataCat.scorePersistence < 5 &&
                         setDataCat({
                           ...dataCat,
                           scorePersistence: dataCat.scorePersistence + 1,
@@ -650,7 +650,7 @@ function ManageDataCat({ name }) {
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCat.scoreFurCare < 10 &&
+                        dataCat.scoreFurCare < 5 &&
                         setDataCat({
                           ...dataCat,
                           scoreFurCare: dataCat.scoreFurCare + 1,
@@ -675,7 +675,7 @@ function ManageDataCat({ name }) {
                   <DivIcon>
                     <AddIcon
                       onClick={() =>
-                        dataCat.scoreFriendliness < 10 &&
+                        dataCat.scoreFriendliness < 5 &&
                         setDataCat({
                           ...dataCat,
                           scoreFriendliness: dataCat.scoreFriendliness + 1,
@@ -696,7 +696,7 @@ function ManageDataCat({ name }) {
               </RatingContainer>
 
               <Note>
-                *หมายเหตุ: คะแนนเต็มในแต่ละช่องคือ 10 คะแนน โดย 1 คะแนนเท่ากับ 1
+                *หมายเหตุ: คะแนนเต็มในแต่ละช่องคือ 5 คะแนน โดย 1 คะแนนเท่ากับ 1
                 ดาว
               </Note>
             </DivRight>

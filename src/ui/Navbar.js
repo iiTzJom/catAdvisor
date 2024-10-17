@@ -88,7 +88,7 @@ function Navbar() {
     { text: "สายพันธุ์แมว", path: "/cat-breeds-list" },
     { text: "เปรียบเทียบสายพันธุ์", path: "/cat-compare" },
     { text: "ความรู้ทั่วไป", path: "/blogs" },
-    { text: "แผนที่", path: "/map" },
+    { text: "แผนที่คลีนิก", path: "/map" },
   ];
   const handleCloseLogin = useCallback(() => {
     setIsOpenLogin(false);

@@ -144,7 +144,7 @@ function NotiVacineList({ name }) {
       })
     );
     setNewList(newData);
-  }, [listVacineNoti]);
+  }, [listVacineNoti, listCatUser]);
 
   const sendMessage = async () => {
     newList.map(async (data) => {
@@ -156,7 +156,7 @@ function NotiVacineList({ name }) {
             data.nameCat +
             '🐱 ฉีด "' +
             data.vacineName +
-            '"วันนี้\nอย่าลืมไปพบคุณหมอนะคะ 💖',
+            '" วันนี้\nอย่าลืมไปพบคุณหมอนะคะ 💖',
         })
           .then((data) => {
             if (data?.data?.code === 200) {
@@ -170,7 +170,7 @@ function NotiVacineList({ name }) {
         await sendLineNotification({
           accessToken: data.accessToken,
           message:
-            "พรุ่งนี้น้อง" +
+            "พรุ่งนี้ น้อง" +
             data.nameCat +
             '🐱 จะได้ฉีด "' +
             data.vacineName +
@@ -220,6 +220,13 @@ function NotiVacineList({ name }) {
     });
   };
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      sendMessage();
+    }, 24 * 60 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
   console.log("----------", newList);
   return (
     <Container>
@@ -240,11 +247,11 @@ function NotiVacineList({ name }) {
           {/* <TableHeaderItem>Tag Id</TableHeaderItem> */}
           <TableHeaderItem>ชื่อแมว</TableHeaderItem>
           <TableHeaderItem>วันที่ฉีด</TableHeaderItem>
-          <TableHeaderItem>วัคซีนวันนี้</TableHeaderItem>
-          <TableHeaderItem>จำนวนวันก่อนฉีด</TableHeaderItem>
+          <TableHeaderItem>ระยะเวลา</TableHeaderItem>
+          <TableHeaderItem>ชื่อวัคซีน</TableHeaderItem>
           <TableHeaderItem>วันฉีดครั้งถัดไป</TableHeaderItem>
-          <TableHeaderItem>วัคซีนครั้งถัดไป</TableHeaderItem>
-          <TableHeaderItem>จำนวนวันก่อนฉีดครั้งถัดไป</TableHeaderItem>
+          <TableHeaderItem>ระยะเวลาครั้งถัดไป</TableHeaderItem>
+          <TableHeaderItem>ชื่อวัคซีนครั้งถัดไป</TableHeaderItem>
         </TableHeader>
         {newList.map((data, i) => (
           <TableRow key={i}>

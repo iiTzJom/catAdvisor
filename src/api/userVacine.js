@@ -35,3 +35,11 @@ export const updateVacine = async (data) => {
 export const getVacineList = async (userName) => {
   return axios.get(`http://localhost:3001/getVacineList`);
 };
+
+export const getVaccineHistory = async (userName) => {
+  return axios.get(`http://localhost:3001/getVaccineHistory`);
+};
+
+export const getVaccineProgram = async (userName) => {
+  return axios.get(`http://localhost:3001/getVaccineProgram`);
+};
